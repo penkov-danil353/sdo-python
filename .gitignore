@@ -1,0 +1,5 @@
+venv/
+*/**/*.so
+.idea/
+__pycache__/
+build/
