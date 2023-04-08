@@ -25,7 +25,6 @@ def get_func_lines(filename: str, funcname: str) -> list:
 def get_vars(evaluation: str) -> list:
     variables = re.split(r'[-+*/()]\*?', evaluation)
     vars_set = list(set([var for var in variables if var not in "01234567890."]))
-    vars_set.sort()
     return [i for i in vars_set if i != '' and i != ' ']
 
 
@@ -64,7 +63,6 @@ def check(func_lines: list, formula: str) -> bool:
             f_val.append(calc_evaluation(replace_vars(formula, value)))
         except Exception:
             pass
-    f_val.sort()
     i: int = 0
     file_vals: list = []
     for match in matches:
@@ -74,12 +72,11 @@ def check(func_lines: list, formula: str) -> bool:
                 file_vals[i].append(calc_evaluation(replace_vars(match, value)))
             except Exception:
                 pass
-        file_vals[i].sort()
+        file_vals[i]
         i += 1
     for file_val in file_vals:
-        for i in range(len(values)):
-            if f_val[i] == file_val[i]:
-                return True
+        if file_val == f_val:
+            return True
     return False
 
 

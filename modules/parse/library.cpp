@@ -119,7 +119,6 @@ int find_rb(const char* eval){
 //если открывающая скобка встречается раньше, чем другие операторы, то меняет приоритет на нее
 double parse(char* eval){
     double ans;
-    char *evall = nullptr, *evalr = nullptr;
     int prior[3] = {-1, -1, -1};
     int weight = -3;
     if (!check_brackets(eval)) throw std::runtime_error("Неправильно расставлены скобки");
@@ -134,50 +133,36 @@ double parse(char* eval){
     switch(prior[1]){
     case 2:case 3: case 4:
             eval[prior[0]] = '\0';
-            evall = new char[strlen(eval)+1];
-            evalr = new char[strlen(eval+prior[0]+1)];
-            memcpy(evall, eval, strlen(eval)+1);
-            memcpy(evalr, eval+1+prior[0], strlen(eval+prior[0]+1));
-            evall[strlen(eval)]='\0';
-            evalr[strlen(eval+prior[0]+1)]='\0';
         break;
         case 0:
             eval[find_rb(eval)] = '\0';
-            evall = new char[strlen(eval)];
-            memcpy(evall, eval+1, strlen(eval));
-            evall[strlen(eval)-1]='\0';
-            break;
-        case 1:
-            evall = new char[strlen(eval)];
-            memcpy(evall, eval+1, strlen(eval));
-            eval[strlen(eval)-1]='\0';
             break;
     }
     switch (prior[1]) {
         case 4:
             if (prior[2]=='+') {
-                ans = parse(evall) + parse(evalr);
+                ans = parse(eval) + parse(eval+1+prior[0]);
             }
             if (prior[2]=='-'){
-                ans = parse(evall) - parse(evalr);
+                ans = parse(eval) - parse(eval+1+prior[0]);
             }
             break;
         case 3:
             if (prior[2]=='*'){
-                ans = parse(evall) * parse(evalr);
+                ans = parse(eval) * parse(eval+1+prior[0]);
             }
             if (prior[2]=='/') {
-                ans = parse(evall) / parse(evalr);
+                ans = parse(eval) / parse(eval+1+prior[0]);
             }
             break;
         case 2:
-            ans = pow(parse(evall), parse(evalr));
+            ans = pow(parse(eval), parse(eval+1+prior[0]));
             break;
         case 0:
-            ans = parse(evall);
+            ans = parse(eval+1);
             break;
         case 1:
-            ans = -parse(evall);
+            ans = -parse(eval+1);
             break;
         case -1:
             check_dots(eval);
@@ -185,8 +170,6 @@ double parse(char* eval){
             ans = std::stod(eval);
             break;
     }
-    delete[] evall;
-    delete[] evalr;
     return ans;
 }
 
