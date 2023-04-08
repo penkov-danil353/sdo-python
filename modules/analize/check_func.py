@@ -1,4 +1,4 @@
-from parsewrapper import calc_evaluation
+from ..parse import parsewrapper as pswr
 from itertools import permutations
 from random import random
 import re
@@ -60,24 +60,29 @@ def check(func_lines: list, formula: str) -> bool:
     values: list = gen_values(get_vars(formula))
     for value in values:
         try:
-            f_val.append(calc_evaluation(replace_vars(formula, value)))
+            f_val.append(pswr.calc_evaluation(replace_vars(formula, value)))
         except Exception:
             pass
+    f_val.sort()
     i: int = 0
     file_vals: list = []
     for match in matches:
         file_vals.append([])
         for value in values:
             try:
-                file_vals[i].append(calc_evaluation(replace_vars(match, value)))
+                file_vals[i].append(pswr.calc_evaluation(replace_vars(match, value)))
             except Exception:
                 pass
-        file_vals[i]
+        file_vals[i].sort()
         i += 1
     for file_val in file_vals:
         if file_val == f_val:
             return True
     return False
+
+
+def check_single_formula(filename: str, func_name: str, formula: str) -> bool:
+    return check(get_func_lines(filename, func_name), formula)
 
 
 if __name__ == "__main__":
