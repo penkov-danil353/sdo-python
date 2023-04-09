@@ -1,1 +1,1 @@
-import parsewrapper
+from .parsewrapper import calc_evaluation

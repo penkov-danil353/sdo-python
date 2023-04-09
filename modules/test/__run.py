@@ -1,6 +1,6 @@
 from typing import Dict, List
 
-from ..analize.check_func import check_single_formula
+from modules.analize.check_func import check_single_formula
 import os
 import re
 import subprocess

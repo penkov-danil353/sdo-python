@@ -1,3 +1,3 @@
-import parse
-import analize
-import test
+from .parse import *
+from .analize import *
+from .test import *
