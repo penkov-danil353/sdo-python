@@ -1,7 +1,16 @@
-from ..parse import parsewrapper as pswr
+from typing import List
 from itertools import permutations
 from random import random
+import tokenize
+import io
 import re
+import os
+import sys
+
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "parse"))
+a = sys.path[-1]
+print(sys.path)
+import parsewrapper as pswr
 
 
 def get_func_lines(filename: str, funcname: str) -> list:
@@ -43,7 +52,7 @@ def replace_vars(evaluation: str, values: list) -> str:
         raise ValueError("1")
 
 
-def check(func_lines: list, formula: str) -> bool:
+def check_single(func_lines: list, formula: str) -> bool:
     matches: list = []
     formula = formula.replace(" ", "")
     pattern: re.Pattern = re.compile(r'\*\*?|/|\+|-|\(|\)', re.IGNORECASE)
@@ -82,9 +91,26 @@ def check(func_lines: list, formula: str) -> bool:
 
 
 def check_single_formula(filename: str, func_name: str, formula: str) -> bool:
-    return check(get_func_lines(filename, func_name), formula)
+    return check_single(get_func_lines(filename, func_name), formula)
+
+
+def check_multiple(func_lines: List[str], formulas: List[str]) -> bool:
+    tokens: list = []
+    for i in range(0, len(formulas)):
+        tokens.append(list())
+        try:
+            tokens[i].append(tokenize(io.StringIO(formulas[i]).readline))
+            for toknum in tokens[i]:
+                print(toknum)
+        except tokenize.TokenError as tkE:
+            print(tkE.__str__())
+    pass
+
+
+def check_multiple_formulas(filename: str, func_name: str, formulas: List[str]) -> bool:
+
+    pass
 
 
 if __name__ == "__main__":
-    lines: list = get_func_lines("compute_binom.py", "compute_binom")
-    print(check(lines, "a-b"))
+    check_multiple(["",], ["s=a+b\n", "d=s*b\n"])
