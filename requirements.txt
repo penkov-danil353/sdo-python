@@ -1,3 +1,4 @@
+sqlalchemy
 fastapi
 cython
 pylint

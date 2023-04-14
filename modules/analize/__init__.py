@@ -1,1 +1,1 @@
-import check_func
+from .check_func import *
