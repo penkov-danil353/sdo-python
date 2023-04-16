@@ -2,15 +2,25 @@ version: "3"
 
 services:
   server:
-    build: .
+    image: ghcr.io/sidecuter/sdo-python:latest
     command:
       - "uvicorn"
       - "main:app"
       - "--reload"
       - "--host"
-      - "0.0.0.0"
+      - "172.16.0.10"
     ports:
       - "8000:8000"
     volumes:
       - ./database:/var/server/database
       - ./trash:/var/server/trash
+    networks:
+      front-tier:
+        ipv4_address: 172.16.0.10
+
+networks:
+  front-tier:
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.16.0.0/24"
