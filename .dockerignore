@@ -10,3 +10,4 @@ Dockerfile
 __pycache__/
 **/*.so
 **/*.o
+.github/
