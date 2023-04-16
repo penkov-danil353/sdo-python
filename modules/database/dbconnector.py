@@ -1,8 +1,10 @@
+from typing import Type
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from modules.models import *
 
-sqlite_database = "sqlite:///test.db"
+sqlite_database = "sqlite:///database/test.db"
 engine = create_engine(sqlite_database, echo=True)
 Base.metadata.create_all(bind=engine)
 
@@ -22,7 +24,11 @@ def get_all_tests():
 
 def get_test_by_id(id_val: int):
     with Session(autoflush=False, bind=engine) as db:
-        test_val = db.query(Test).filter(Test.id == id_val).first()
+        test_val: Type[Test] = db.query(Test).filter(Test.id == id_val).first()
+        for function in test_val.functions:
+            function.func_name
+            function.datas
+            function.formulas
         return test_val
 
 

@@ -14,7 +14,7 @@ extern "C"
 {
 #endif
 
-__declspec (dllexport) double calc_eval(char* eval);
+double calc_eval(char* eval);
 
 #ifdef __cplusplus
 }

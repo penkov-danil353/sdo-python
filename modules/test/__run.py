@@ -1,10 +1,9 @@
 from typing import Dict, List
 
-from modules.analize.check_func import check_single_formula
+# from modules.analize.check_func import check_single_formula
 import os
 import re
 import subprocess
-#import test_'''+json_data['test_file_name'][:-3]+'''
 
 
 def gen_config():
@@ -12,11 +11,11 @@ def gen_config():
 
 
 def clear_output(check_result):
-    rows = check_result.split('\\n')
+    rows = check_result.split('\n')
     struct_result = dict()
     cur_module = ""
     for row in rows:
-        if cur_module != "" and re.match(cur_module + r'\.py', row) is not None:
+        if cur_module != "" and re.match(r'.*/'+cur_module + r'\.py', row) is not None:
             error_name = row[row.rfind('(') + 1:-1]
             if struct_result[cur_module].get(error_name) is None:
                 struct_result[cur_module][error_name] = list()
@@ -27,22 +26,22 @@ def clear_output(check_result):
     return struct_result
 
 
-def run(filename: str, func_and_formula: Dict[str, List[str]]) -> bool:
-    result = True
-    status = subprocess.getstatusoutput("pylint --reports=y text " + filename)
+def run(filename: str, func_and_formula: Dict[str, List[str]] = None):
+    # result = True
+    status = subprocess.getstatusoutput("pylint --reports=y ./trash/" + filename)
     r = ""
     if status[0] != 127:
         r = clear_output(status[1])
-    with open('errors.txt', 'w') as file:
+    with open('./trash/errors.txt', 'w') as file:
         for module, errors in r.items():
-            file.write(module + '.py:\\n')
+            file.write(module + '.py:\n')
             for error_name, error_messages in errors.items():
-                file.write('\\t' + error_name + ':\\n')
+                file.write('\t' + error_name + ':\n')
                 for error_message in error_messages:
-                    file.write('\\t\\t' + error_message + '\\n')
-    for func, formula in func_and_formula.items():
+                    file.write('\t\t' + error_message + '\n')
+        '''    for func, formula in func_and_formula.items():
         if len(formula) == 1:
             result = result and check_single_formula(filename, func, formula[0])
         else:
             pass
-    return result
+    return result'''

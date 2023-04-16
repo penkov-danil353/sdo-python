@@ -1,0 +1,13 @@
+.git/
+.idea/
+.gitignore
+trash/
+database/
+venv/
+**/.pytest_cache/
+docker-compose.yml
+Dockerfile
+__pycache__/
+**/*.so
+**/*.o
+.github/

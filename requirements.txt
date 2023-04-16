@@ -1,6 +1,5 @@
 sqlalchemy
 fastapi
-cython
 pylint
 pytest
 uvicorn
