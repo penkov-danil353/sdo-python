@@ -1,5 +1,5 @@
 from base64 import b64encode
-from typing import Dict
+from typing import Dict, List
 from fastapi import FastAPI, Body
 from fastapi.responses import HTMLResponse
 from fastapi.responses import JSONResponse
@@ -48,15 +48,18 @@ def check_task(id, body=Body()) -> JSONResponse:
     for function in test.functions:
         function.test = None
         functions.append(function)
-    run_test(filename, functions)
+    checks: Dict[str, list] = run_test(filename, functions)
     with open("./trash/output.xml", "rb") as file:
         output = b64encode(file.read()).decode('utf-8')
     with open("./trash/errors.txt", "rb") as file:
         error = b64encode(file.read()).decode('utf-8')
-    shutil.rmtree("./.pytest_cache")
+    try:
+        shutil.rmtree("./.pytest_cache")
+    except Exception:
+        pass
     remove("./trash")
     return JSONResponse(content=jsonable_encoder(
-        {"test_results": output, "test_errors": error, "test_passed": ["void", "void"]}))
+        {"test_results": output, "test_errors": error, "test_passed": checks}))
 
 
 @app.post("/newtask")

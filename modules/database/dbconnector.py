@@ -4,7 +4,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from modules.models import *
 
-sqlite_database = "sqlite:///database/test.db"
+import os
+
+sqlite_database = os.environ.get("db_con", "sqlite:///database/test.db")
 engine = create_engine(sqlite_database, echo=True)
 Base.metadata.create_all(bind=engine)
 
@@ -30,18 +32,3 @@ def get_test_by_id(id_val: int):
             function.datas
             function.formulas
         return test_val
-
-
-if __name__ == "__main__":
-    test: Test = Test(description="1", functions=[Function(
-        func_name="compute_binom",
-        datas=[Data(data_pose=0, data="2"), Data(data_pose=1, data="2"), Data(data_pose=-1, data="1")],
-        formulas=[Formula(num=0, formula="z = n - k")]
-    )])
-    test1: Test = Test(description="1", functions=[Function(
-        func_name="factorial",
-        datas=[Data(data_pose=0, data="5"), Data(data_pose=-1, data="120")]
-    )])
-    add_data(test, test1)
-    for test in get_all_tests():
-        print(get_test_by_id(test.id))

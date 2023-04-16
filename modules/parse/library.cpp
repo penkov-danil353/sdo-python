@@ -67,11 +67,14 @@ int find_op_w(const char& op){
         case '^':
             weight = 2;
             break;
-        case '*': case '/':
+        case '/':
             weight = 3;
             break;
-        case '+': case '-':
+        case '*':
             weight = 4;
+            break;
+        case '+': case '-':
+            weight = 5;
             break;
         default:
             weight = -1;
@@ -130,7 +133,7 @@ double parse(char* eval){
         }
     }
     switch(prior[1]){
-    case 2:case 3: case 4:
+    case 2:case 3: case 4: case 5:
             eval[prior[0]] = '\0';
         break;
         case 0:
@@ -138,7 +141,7 @@ double parse(char* eval){
             break;
     }
     switch (prior[1]) {
-        case 4:
+        case 5:
             if (prior[2]=='+') {
                 ans = parse(eval) + parse(eval+1+prior[0]);
             }
@@ -146,13 +149,11 @@ double parse(char* eval){
                 ans = parse(eval) - parse(eval+1+prior[0]);
             }
             break;
+        case 4:
+            ans = parse(eval) * parse(eval+1+prior[0]);
+            break;
         case 3:
-            if (prior[2]=='*'){
-                ans = parse(eval) * parse(eval+1+prior[0]);
-            }
-            if (prior[2]=='/') {
-                ans = parse(eval) / parse(eval+1+prior[0]);
-            }
+            ans = parse(eval) / parse(eval+1+prior[0]);
             break;
         case 2:
             ans = pow(parse(eval), parse(eval+1+prior[0]));
