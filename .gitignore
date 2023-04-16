@@ -7,3 +7,5 @@ __pycache__/
 **/*.pyd
 **/*.dll
 **/.pytest_cache/
+*.db
+*.sqlite

@@ -1,28 +1,65 @@
-from json import load as jload
-from base64 import decodebytes as bdecode
-import subprocess
+from modules.models.db_class import *
+import pytest
 
 
-def a():
-    with open('test_data.json', 'r') as json_file:
-        json_data = jload(json_file)
+def tonumber(value: str):
+    try:
+        return int(value)
+    except ValueError:
+        pass
+    try:
+        return float(value)
+    except ValueError:
+        pass
+    return value
 
-    with open(json_data['test_file_name'], 'w') as test_file:
-        test_file.write(bdecode(json_data['test_file'].encode('utf-8')).decode('utf-8'))
 
-    letters = ', '.join([chr(i) for i in range(97, 97+int(json_data['test_data_var_count']))])
+def gentest(function: str, data: list, i: str):
+    letters = ', '.join([chr(i) for i in range(97, 97 + len(data[0][:-1]))])
+    test = '''@pytest.mark.parametrize("''' + letters + ', expected_result", ' + data.__str__() + ''')
+def test_''' + function + '_' + i + '(' + letters + ''', expected_result):
+    assert ''' + function + '(' + letters + ') == expected_result\n\n\n'
+    return test
 
-    with open('test_'+json_data['test_file_name'], 'w') as test:
-        test.write('''
-    from '''+json_data['test_file_name'][:-3]+''' import '''+json_data['test_func_name']+'''
-    import pytest
-    
-    pytest.main(['--junitxml=output.xml'])
-    
-    @pytest.mark.parametrize("'''+letters+''', expected_result", '''+json_data['test_data']+''')
-    def test_'''+json_data['test_func_name']+'''_test_1('''+letters+''', expected_result):
-        assert '''+json_data['test_func_name']+'''('''+letters+''') == expected_result
-    
-    def run():
-        pytest.main()
-    ''')
+
+def a(filename: str, function_test: List[Function]):
+    with open('test_'+filename, 'w') as test:
+        test.write('''from '''+filename[:-3]+''' import *
+import pytest
+
+
+''')
+        i: int = 0
+        for function in function_test:
+            set1 = set([data.data_pose for data in function.datas])
+            datas = [tonumber(data.data) for data in function.datas]
+            data_t = [tuple([data for data in datas[i:i+len(set1)]]) for i in range(0, len(datas), len(set1))]
+            del datas
+            del set1
+            test.write(gentest(function.func_name, data_t, str(i)))
+            i = i + 1
+    pytest.main(["-q", "test_factorial.py", "--junitxml=output.xml"])
+
+
+if __name__ == "__main__":
+    func = [Function(
+        func_name="compute_binom",
+        datas=[Data(data_pose=0, data="2"), Data(data_pose=1, data="2"), Data(data_pose=-1, data="1"),
+               Data(data_pose=0, data="1"), Data(data_pose=1, data="1"), Data(data_pose=-1, data="1"),
+               Data(data_pose=0, data="2"), Data(data_pose=1, data="1"), Data(data_pose=-1, data="2"),
+               Data(data_pose=0, data="10"), Data(data_pose=1, data="1"), Data(data_pose=-1, data="10"),
+               Data(data_pose=0, data="10"), Data(data_pose=1, data="2"), Data(data_pose=-1, data="45"),
+               Data(data_pose=0, data="15"), Data(data_pose=1, data="2"), Data(data_pose=-1, data="105"),
+               Data(data_pose=0, data="100"), Data(data_pose=1, data="3"), Data(data_pose=-1, data="161700"),
+               Data(data_pose=0, data="64"), Data(data_pose=1, data="7"), Data(data_pose=-1, data="621216192")],
+        formulas=[Formula(num=0, formula="z = n - k")]
+    ), Function(
+        func_name="factorial",
+        datas=[Data(data_pose=0, data="0"), Data(data_pose=-1, data="1"),
+               Data(data_pose=0, data="1"), Data(data_pose=-1, data="1"),
+               Data(data_pose=0, data="2"), Data(data_pose=-1, data="2"),
+               Data(data_pose=0, data="3"), Data(data_pose=-1, data="6"),
+               Data(data_pose=0, data="4"), Data(data_pose=-1, data="24")],
+        formulas=[Formula(num=0, formula="z = n - k")]
+    )]
+    a("factorial.py", func)
