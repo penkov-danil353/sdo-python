@@ -1,4 +1,6 @@
 from modules.models.db_class import *
+from .__run import *
+from base64 import decodebytes as bdecode
 import pytest
 
 
@@ -23,7 +25,7 @@ def test_''' + function + '_' + i + '(' + letters + ''', expected_result):
 
 
 def a(filename: str, function_test: List[Function]):
-    with open('test_'+filename, 'w') as test:
+    with open('./trash/test_'+filename, 'w') as test:
         test.write('''from '''+filename[:-3]+''' import *
 import pytest
 
@@ -34,11 +36,20 @@ import pytest
             set1 = set([data.data_pose for data in function.datas])
             datas = [tonumber(data.data) for data in function.datas]
             data_t = [tuple([data for data in datas[i:i+len(set1)]]) for i in range(0, len(datas), len(set1))]
-            del datas
-            del set1
-            test.write(gentest(function.func_name, data_t, str(i)))
+            funcname = function.func_name
+            test.write(gentest(funcname, data_t, str(i)))
             i = i + 1
-    pytest.main(["-q", "test_factorial.py", "--junitxml=output.xml"])
+    pytest.main(["-q", './trash/test_'+filename, "--junitxml=./trash/output.xml"])
+
+
+def write_file(filename: str, file: str):
+    with open('./trash/'+filename, 'w') as test_file:
+        test_file.write(bdecode(file.encode('utf-8')).decode('utf-8'))
+
+
+def run_test(filename: str, func: List[Function]):
+    a(filename, func)
+    run(filename)
 
 
 if __name__ == "__main__":
@@ -63,3 +74,4 @@ if __name__ == "__main__":
         formulas=[Formula(num=0, formula="z = n - k")]
     )]
     a("factorial.py", func)
+    run("factorial.py")

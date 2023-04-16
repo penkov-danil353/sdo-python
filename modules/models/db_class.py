@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import List
 from sqlalchemy.orm import DeclarativeBase, relationship, mapped_column, Mapped
-from sqlalchemy import ForeignKey, PrimaryKeyConstraint
+from sqlalchemy import ForeignKey
 
 
 class Base(DeclarativeBase):
@@ -27,14 +27,11 @@ class Function(Base):
 
 class Data(Base):
     __tablename__ = "Data"
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     data_pose: Mapped[int] = mapped_column()
     data: Mapped[str] = mapped_column(nullable=False)
     functionid: Mapped[int] = mapped_column(ForeignKey("Function.id"))
     function_t: Mapped["Function"] = relationship(back_populates="datas")
-    __table_args__ = (
-        PrimaryKeyConstraint(data_pose, functionid),
-        {},
-    )
 
 
 class Formula(Base):
