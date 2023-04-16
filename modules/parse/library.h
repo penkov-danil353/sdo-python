@@ -9,15 +9,15 @@
 #include <cstring>
 #include <cstdlib>
 
-bool check_brackets(const char* eval);
-bool isUnary(const char* eval, const size_t& op_pos);
-bool check_op_in_br(const char* eval, const size_t& op_pos);
-int find_op_w(const char& op);
-bool symb_is_num(const char& symb);
-void check_num(const char* eval);
-void check_dots(const char* eval);
-int find_rb(const char* eval);
-double parse(char* eval);
-double calc_eval(char* eval);
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+__declspec (dllexport) double calc_eval(char* eval);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //PARSE_LIBRARY_H

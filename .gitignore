@@ -2,4 +2,10 @@ venv/
 */**/*.so
 .idea/
 __pycache__/
-build/
+**/build/
+**/parsewrapper.cpp
+**/*.pyd
+**/*.dll
+**/.pytest_cache/
+*.db
+*.sqlite

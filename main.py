@@ -1,7 +1,10 @@
+from typing import Dict
 from fastapi import FastAPI, Body
 from fastapi.responses import HTMLResponse
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
+from modules.database.dbconnector import *
+from modules.models.db_class import *
 
 app = FastAPI()
 
@@ -14,11 +17,16 @@ def read_root():
 
 @app.get("/tasks")
 def get_tasks():
-    return JSONResponse(content={1: "void"})
+    tests: List[Test] = get_all_tests()
+    content: Dict[str, str] = {}
+    for test in tests:
+        content[test.id.__str__()] = test.description
+    return JSONResponse(content=content)
 
 
 @app.get("/check/{id}")
 def check_task(task_id: int, body=Body()):
+    test: Test = get_test_by_id(task_id)
     return JSONResponse(content={"test_results": "void", "test_errors": "void", "test_passed": ["void", "void"]})
 
 

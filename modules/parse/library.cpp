@@ -14,7 +14,6 @@
 bool check_brackets(const char* eval){
     int br_counter = 0;
     for (int i = 0; i < strlen(eval);i++){
-    //for (char letter : eval){
         if (eval[i] == '(') br_counter++;
         else if (eval[i] == ')'){
             br_counter--;
