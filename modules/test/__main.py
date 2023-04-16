@@ -1,6 +1,7 @@
 from modules.models.db_class import *
 from .__run import *
 from base64 import decodebytes as bdecode
+from modules.analize.check_func import *
 import pytest
 
 
@@ -47,31 +48,34 @@ def write_file(filename: str, file: str):
         test_file.write(bdecode(file.encode('utf-8')).decode('utf-8'))
 
 
-def run_test(filename: str, func: List[Function]):
+def run_test(filename: str, func: List[Function]) -> Dict[str, list]:
     a(filename, func)
     run(filename)
-
-
-if __name__ == "__main__":
-    func = [Function(
-        func_name="compute_binom",
-        datas=[Data(data_pose=0, data="2"), Data(data_pose=1, data="2"), Data(data_pose=-1, data="1"),
-               Data(data_pose=0, data="1"), Data(data_pose=1, data="1"), Data(data_pose=-1, data="1"),
-               Data(data_pose=0, data="2"), Data(data_pose=1, data="1"), Data(data_pose=-1, data="2"),
-               Data(data_pose=0, data="10"), Data(data_pose=1, data="1"), Data(data_pose=-1, data="10"),
-               Data(data_pose=0, data="10"), Data(data_pose=1, data="2"), Data(data_pose=-1, data="45"),
-               Data(data_pose=0, data="15"), Data(data_pose=1, data="2"), Data(data_pose=-1, data="105"),
-               Data(data_pose=0, data="100"), Data(data_pose=1, data="3"), Data(data_pose=-1, data="161700"),
-               Data(data_pose=0, data="64"), Data(data_pose=1, data="7"), Data(data_pose=-1, data="621216192")],
-        formulas=[Formula(num=0, formula="z = n - k")]
-    ), Function(
-        func_name="factorial",
-        datas=[Data(data_pose=0, data="0"), Data(data_pose=-1, data="1"),
-               Data(data_pose=0, data="1"), Data(data_pose=-1, data="1"),
-               Data(data_pose=0, data="2"), Data(data_pose=-1, data="2"),
-               Data(data_pose=0, data="3"), Data(data_pose=-1, data="6"),
-               Data(data_pose=0, data="4"), Data(data_pose=-1, data="24")],
-        formulas=[Formula(num=0, formula="z = n - k")]
-    )]
-    a("factorial.py", func)
-    run("factorial.py")
+    checks: Dict[str, list] = {}
+    for function in func:
+        formulas = list([formula for formula in function.formulas])
+        if not checks.get(function.func_name, False) and len(formulas) != 0:
+            checks[function.func_name] = []
+        if len(formulas) > 1:
+            formula_parsed: List[list] = [[]]
+            i: int = 0
+            last_state: int = 0
+            for formula in formulas:
+                if last_state > formula.num:
+                    i += 1
+                    formula_parsed.append([])
+                last_state = formula.num
+                formula_parsed[i].append(formula.formula)
+            for formulas_t in formula_parsed:
+                buffer: list = []
+                for formula_t in formulas_t:
+                    buffer.append(formula_t)
+                if len(formulas_t) > 1:
+                    buffer.append(check_multiple_formulas(filename, function.func_name, formulas_t))
+                elif len(formulas_t) == 1:
+                    buffer.append(check_single_formula(filename, function.func_name, formulas_t.pop()))
+                checks[function.func_name].append(buffer)
+        elif len(formulas) == 1:
+            formula = formulas.pop().formula
+            checks[function.func_name].append([formula, check_single_formula(filename, function.func_name, formula)])
+    return checks

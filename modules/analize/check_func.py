@@ -22,7 +22,7 @@ def get_match(formula: str, lines: list) -> list:
 
 
 def get_func_lines(filename: str, funcname: str) -> list:
-    with open(filename, 'r') as file:
+    with open('./trash/'+filename, 'r') as file:
         file_lines: list = file.readlines()
     func: list = []
     flag: bool = True
@@ -105,6 +105,7 @@ def tokens_match(tokens: list) -> list:
             for token1 in tokens[0]:
                 if token1.type == 1 and token1.string == token.string:
                     tokens_in_1.append(tokens[0].index(token1))
+    tokens_in_1.sort()
     return tokens_in_1
 
 
@@ -121,7 +122,3 @@ def check_multiple(func_lines: list, formulas: list) -> bool:
 
 def check_multiple_formulas(filename: str, func_name: str, formulas: list) -> bool:
     return check_multiple(get_func_lines(filename, func_name), formulas)
-
-
-if __name__ == "__main__":
-    check_multiple(["pass = asd + dfa", "fick = pass * dfa"], ["s=a+b", "d=s*b"])
