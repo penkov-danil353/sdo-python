@@ -1,19 +1,18 @@
 from base64 import b64encode
-from typing import Dict, List
+from typing import Dict, Any, List, Type
 from fastapi import FastAPI, Body
-from fastapi.responses import HTMLResponse
-from fastapi.responses import JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.encoders import jsonable_encoder
 from modules.database.dbconnector import *
 from modules.models.db_class import *
-from modules.test.__main import *
+from modules.test.test_main import *
 import os
 import shutil
 
 
-def remove(folder: str):
+def remove(folder: str) -> None:
     for filename in os.listdir(folder):
-        file_path = os.path.join(folder, filename)
+        file_path: str = os.path.join(folder, filename)
         try:
             if os.path.isfile(file_path) or os.path.islink(file_path):
                 os.unlink(file_path)
@@ -26,33 +25,33 @@ def remove(folder: str):
 app = FastAPI()
 
 
-@app.get("/", status_code=404)
-def read_root():
-    html_content = "Nothing to see here"
+@app.get("/")
+def read_root() -> HTMLResponse:
+    html_content: str = "Nothing to see here"
     return HTMLResponse(content=html_content, status_code=404)
 
 
 @app.get("/tasks")
-def get_tasks():
+def get_tasks() -> JSONResponse:
     content: Dict[str, str] = {str(test.id): test.description for test in get_all_tests()}
     return JSONResponse(content=content)
 
 
 @app.get("/check/{id}")
 def check_task(id, body=Body()) -> JSONResponse:
-    file = body["file"]
-    test: Test = get_test_by_id(id)
-    filename = "test_unit.py"
+    file: str = body["file"]
+    test: Type[Test] = get_test_by_id(id)
+    filename: str = "test_unit.py"
     write_file(filename, file)
     functions = []
     for function in test.functions:
         function.test = None
         functions.append(function)
-    checks: Dict[str, list] = run_test(filename, functions)
-    with open("./trash/output.xml", "rb") as file:
-        output = b64encode(file.read()).decode('utf-8')
-    with open("./trash/errors.txt", "rb") as file:
-        error = b64encode(file.read()).decode('utf-8')
+    checks: Dict[str, List[Any]] = run_test(filename, functions)
+    with open("./trash/output.xml", "rb") as export_file:
+        output: str = b64encode(export_file.read()).decode('utf-8')
+    with open("./trash/errors.txt", "rb") as export_file:
+        error: str = b64encode(export_file.read()).decode('utf-8')
     try:
         shutil.rmtree("./.pytest_cache")
     except Exception:

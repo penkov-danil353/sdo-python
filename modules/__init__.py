@@ -1,3 +1,1 @@
-from .parse import *
-from .analize import *
-from .test import *
+__all__ = ["analize", "parse", "test"]

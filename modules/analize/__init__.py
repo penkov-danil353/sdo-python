@@ -1,1 +1,1 @@
-from .check_func import *
+__all__ = ["check_func"]
