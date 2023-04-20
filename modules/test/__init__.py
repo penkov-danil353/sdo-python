@@ -1,2 +1,1 @@
-from .__main import *
-from .__run import *
+__all__ = ["test_main", "test_run"]

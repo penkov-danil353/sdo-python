@@ -13,5 +13,4 @@ def calc_evaluation(evaluation: str) -> float:
     return lib.calc_eval(ctypes.c_char_p(evaluation.encode('utf-8')))
 
 
-if __name__ == "__main__":
-    print(calc_evaluation("2*2+2/(2**2)"))
+__all__ = ["calc_evaluation"]

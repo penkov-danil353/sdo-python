@@ -1,1 +1,1 @@
-from .dbconnector import *
+__all__ = ["dbconnector"]

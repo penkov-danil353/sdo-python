@@ -1,1 +1,1 @@
-from .db_class import *
+__all__ = ["db_class"]

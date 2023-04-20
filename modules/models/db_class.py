@@ -1,4 +1,3 @@
-from __future__ import annotations
 from typing import List
 from sqlalchemy.orm import DeclarativeBase, relationship, mapped_column, Mapped
 from sqlalchemy import ForeignKey
@@ -39,5 +38,8 @@ class Formula(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     num: Mapped[int] = mapped_column(nullable=False)
     formula: Mapped[str] = mapped_column(nullable=False)
-    functionid: Mapped[int] = mapped_column(ForeignKey("Function.id"))
+    functionid: Mapped[str] = mapped_column(ForeignKey("Function.id"))
     function_t: Mapped["Function"] = relationship(back_populates="formulas")
+
+
+__all__ = ["Base", "Test", "Formula", "Data", "Function"]
