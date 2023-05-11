@@ -1,12 +1,14 @@
 from typing import Type, List
 
+from time import sleep
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from modules.models.db_class import *
 
 import os
 
-sqlite_database = os.environ.get("db_con", "sqlite:///database/test.db")
+sqlite_database = os.environ.get("DB_CON", "sqlite:///database/test.db")
 engine = create_engine(sqlite_database, echo=True)
 Base.metadata.create_all(bind=engine)
 

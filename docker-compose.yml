@@ -3,7 +3,7 @@ version: "3"
 services:
   server:
     environment:
-      db_con: postgresql+psycopg2://${SDOP_DB_USER}:${SDOP_DB_PASS}@172.16.0.11:5432/${SDOP_DB_NAME}
+      DB_CON: postgresql+psycopg2://${SDOP_DB_USER}:${SDOP_DB_PASS}@172.16.0.11:5432/${SDOP_DB_NAME}
     build: .
     command:
       - "uvicorn"
