@@ -12,6 +12,8 @@ class Test(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     description: Mapped[str] = mapped_column()
     functions: Mapped[List["Function"]] = relationship(back_populates="test", cascade="all, delete-orphan")
+    lengths: Mapped[List["CodeLength"]] = relationship(back_populates="test", cascade="all, delete-orphan")
+    constructions: Mapped[List["Construction"]] = relationship(back_populates="test", cascade="all, delete-orphan")
 
 
 class Function(Base):
@@ -42,4 +44,22 @@ class Formula(Base):
     function_t: Mapped["Function"] = relationship(back_populates="formulas")
 
 
-__all__ = ["Base", "Test", "Formula", "Data", "Function"]
+class CodeLength(Base):
+    __tablename__ = "CodeLength"
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    symbols: Mapped[int] = mapped_column(nullable=True)
+    rows: Mapped[int] = mapped_column(nullable=True)
+    testid: Mapped[int] = mapped_column(ForeignKey("Test.id"))
+    test: Mapped["Test"] = relationship(back_populates="lengths")
+
+
+class Construction(Base):
+    __tablename__ = "Construction"
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(nullable=False)
+    state: Mapped[bool] = mapped_column(nullable=False)
+    testid: Mapped[int] = mapped_column(ForeignKey("Test.id"))
+    test: Mapped["Test"] = relationship(back_populates="constructions")
+
+
+__all__ = ["Base", "Test", "Formula", "Data", "Function", "Construction", "CodeLength"]

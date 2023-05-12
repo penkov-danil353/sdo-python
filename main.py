@@ -4,6 +4,7 @@ from fastapi import FastAPI, Body
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.encoders import jsonable_encoder
 from modules.database.dbconnector import *
+from modules.models.data_model import QueryData
 from modules.models.db_class import *
 from modules.test.test_main import *
 import os
@@ -62,5 +63,9 @@ def check_task(id, body=Body()) -> JSONResponse:
 
 
 @app.post("/newtask")
-def insert_task(body=Body()) -> JSONResponse:
-    return JSONResponse(content={"error_code": -1})
+def insert_task(item: QueryData) -> JSONResponse:
+    try:
+        answer: str = insert_vals(item.lab_task)
+        return JSONResponse(content={"status": answer})
+    except Exception as ex:
+        return JSONResponse(content={"status": ex.__str__()}, status_code=400)
