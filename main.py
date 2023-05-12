@@ -64,4 +64,8 @@ def check_task(id, body=Body()) -> JSONResponse:
 
 @app.post("/newtask")
 def insert_task(item: QueryData) -> JSONResponse:
-    return JSONResponse(content={"error_code": -1})
+    try:
+        answer: str = insert_vals(item.lab_task)
+        return JSONResponse(content={"status": answer})
+    except Exception as ex:
+        return JSONResponse(content={"status": ex.__str__()}, status_code=400)

@@ -62,4 +62,4 @@ class Construction(Base):
     test: Mapped["Test"] = relationship(back_populates="constructions")
 
 
-__all__ = ["Base", "Test", "Formula", "Data", "Function"]
+__all__ = ["Base", "Test", "Formula", "Data", "Function", "Construction", "CodeLength"]

@@ -39,7 +39,7 @@ class CodeLengthModel(BaseModel):
 
 
 class TestModel(BaseModel):
-    task_test: str = Field(description="Task description", max_length=1024)
+    task_text: str = Field(description="Task description", max_length=1024)
     functions: List[FunctionModel] | None = Field(default=None, description="Test case for function testing")
     constructions: List[ConstructionModel] | None = Field(default=None,
                                                           description="List of constructions for check")
