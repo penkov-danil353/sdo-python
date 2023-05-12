@@ -2,12 +2,41 @@ version: "3"
 
 services:
   server:
+    environment:
+      DB_CON: postgresql+psycopg2://${SDOP_DB_USER}:${SDOP_DB_PASS}@172.16.0.11:5432/${SDOP_DB_NAME}
     build: .
     command:
       - "uvicorn"
       - "main:app"
       - "--reload"
       - "--host"
-      - "0.0.0.0"
+      - "172.16.0.10"
     ports:
       - "8000:8000"
+    volumes:
+      - ./trash:/var/server/trash
+    networks:
+      front-tier:
+        ipv4_address: 172.16.0.10
+    depends_on:
+      - database
+  database:
+    image: postgres:13.3
+    environment:
+      POSTGRES_DB: "${SDOP_DB_NAME}"
+      POSTGRES_USER: "${SDOP_DB_USER}"
+      POSTGRES_PASSWORD: "${SDOP_DB_PASS}"
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./database:/var/lib/postgresql/data
+    networks:
+      front-tier:
+        ipv4_address: 172.16.0.11
+
+networks:
+  front-tier:
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.16.0.0/24"

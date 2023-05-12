@@ -1,0 +1,6 @@
+sqlalchemy
+fastapi
+pylint
+pytest
+uvicorn
+psycopg2-binary

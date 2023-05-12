@@ -2,4 +2,9 @@ venv/
 */**/*.so
 .idea/
 __pycache__/
-build/
+**/*.dll
+**/.pytest_cache/
+database/
+trash/
+**/*.o
+.env
