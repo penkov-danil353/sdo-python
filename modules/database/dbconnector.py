@@ -9,7 +9,7 @@ from modules.models.data_model import *
 
 import os
 
-sleep(60)
+sleep(15)
 sqlite_database = os.environ.get("DB_CON", "sqlite:///database/test.db")
 engine = create_engine(sqlite_database, echo=True)
 Base.metadata.create_all(bind=engine)
