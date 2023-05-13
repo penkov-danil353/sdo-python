@@ -7,6 +7,7 @@ from modules.database.dbconnector import *
 from modules.models.data_model import QueryData
 from modules.models.db_class import *
 from modules.test.test_main import *
+from modules.analize.check_symbols import *
 import os
 import shutil
 import random
@@ -39,6 +40,9 @@ async def check_task(id, body=Body()) -> JSONResponse:
     filename: str = "test_unit.py"
     write_file(filename, file, unique_id)
     checks: Dict[str, List[Any]] = run_test(filename, test.functions, unique_id)
+    lengths: List[Dict[str, int | bool | None]] = [
+        check_symbols(filename, length, unique_id) for length in test.lengths
+    ]
     with open(f"./trash/{unique_id}/output.xml", "rb") as export_file:
         output: str = b64encode(export_file.read()).decode('utf-8')
     with open(f"./trash/{unique_id}/errors.txt", "rb") as export_file:
@@ -49,7 +53,7 @@ async def check_task(id, body=Body()) -> JSONResponse:
         except Exception as e:
             print(e.__str__())
     return JSONResponse(content=jsonable_encoder(
-        {"test_results": output, "test_errors": error, "test_passed": checks}))
+        {"test_results": output, "test_errors": error, "test_passed": checks, "lengths": lengths}))
 
 
 @app.post("/newtask")
