@@ -14,7 +14,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./trash:/var/server/trash
+      - trash:/var/server/trash
     networks:
       front-tier:
         ipv4_address: 172.16.0.10
@@ -36,6 +36,7 @@ services:
 
 volumes:
   db-data:
+  trash:
 
 networks:
   front-tier:
