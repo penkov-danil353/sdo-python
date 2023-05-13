@@ -1,1 +1,1 @@
-__all__ = ["check_func"]
+__all__ = ["check_func", "check_symbols"]

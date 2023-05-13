@@ -35,6 +35,8 @@ async def get_test_by_id(id_val: int) -> Type[Test]:
             function.func_name
             function.datas
             function.formulas
+        test_val.lengths
+        test_val.constructions
         return test_val
 
 
