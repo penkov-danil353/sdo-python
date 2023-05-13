@@ -28,8 +28,8 @@ def test_''' + function + '_' + i + '(' + letters + ''', expected_result):
     return test
 
 
-def a(filename: str, function_test: List[Function]) -> None:
-    with open('./trash/test_'+filename, 'w') as test:
+def a(filename: str, function_test: List[Function], unique_id: str) -> None:
+    with open(f'./trash/{unique_id}/test_{filename}', 'w') as test:
         test.write('''from '''+filename[:-3]+''' import *
 import pytest
 
@@ -44,17 +44,17 @@ import pytest
             funcname: str = function.func_name
             test.write(gentest(funcname, data_t, str(i)))
             i = i + 1
-    pytest.main(["-q", './trash/test_'+filename, "--junitxml=./trash/output.xml"])
+    pytest.main(["-q", f'./trash/{unique_id}/test_{filename}', f"--junitxml=./trash/{unique_id}/output.xml"])
 
 
-def write_file(filename: str, file: str) -> None:
-    with open('./trash/'+filename, 'w') as test_file:
+def write_file(filename: str, file: str, unique_id: str) -> None:
+    with open(f'./trash/{unique_id}/{filename}', 'w') as test_file:
         test_file.write(bdecode(file.encode('utf-8')).decode('utf-8'))
 
 
-def run_test(filename: str, func: List[Function]) -> Dict[str, List[Any]]:
-    a(filename, func)
-    run(filename)
+def run_test(filename: str, func: List[Function], unique_id: str) -> Dict[str, List[Any]]:
+    a(filename, func, unique_id)
+    run(filename, unique_id)
     checks: Dict[str, list] = {}
     for function in func:
         formulas: List[Formula] = list([formula for formula in function.formulas])
@@ -75,13 +75,14 @@ def run_test(filename: str, func: List[Function]) -> Dict[str, List[Any]]:
                 for formula_t in formulas_t:
                     buffer.append(formula_t)
                 if len(formulas_t) > 1:
-                    buffer.append(check_multiple_formulas(filename, function.func_name, formulas_t))
+                    buffer.append(check_multiple_formulas(filename, function.func_name, formulas_t, unique_id))
                 elif len(formulas_t) == 1:
-                    buffer.append(check_single_formula(filename, function.func_name, formulas_t.pop()))
+                    buffer.append(check_single_formula(filename, function.func_name, formulas_t.pop(), unique_id))
                 checks[function.func_name].append(buffer)
         elif len(formulas) == 1:
             formula = formulas.pop().formula
-            checks[function.func_name].append([formula, check_single_formula(filename, function.func_name, formula)])
+            checks[function.func_name].append([formula, check_single_formula(
+                filename, function.func_name, formula, unique_id)])
     return checks
 
 

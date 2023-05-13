@@ -24,12 +24,12 @@ def clear_output(check_result: str) -> Dict[str, Dict[str, List[str]]]:
     return struct_result
 
 
-def run(filename: str) -> None:
-    status = subprocess.getstatusoutput("pylint --reports=y ./trash/" + filename)
+def run(filename: str, unique_id: str) -> None:
+    status = subprocess.getstatusoutput(f"pylint --reports=y ./trash/{unique_id}/{filename}")
     r = ""
     if status[0] != 127:
         r = clear_output(status[1])
-    with open('./trash/errors.txt', 'w') as file:
+    with open(f'./trash/{unique_id}/errors.txt', 'w') as file:
         for module, errors in r.items():
             file.write(module + '.py:\n')
             for error_name, error_messages in errors.items():

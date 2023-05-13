@@ -23,8 +23,8 @@ def get_match(formula: str, lines: List[str]) -> List[str]:
     return matches
 
 
-def get_func_lines(filename: str, funcname: str) -> List[str]:
-    with open('./trash/'+filename, 'r') as file:
+def get_func_lines(filename: str, funcname: str, unique_id: str) -> List[str]:
+    with open(f'./trash/{unique_id}/{filename}', 'r') as file:
         file_lines: List[str] = file.readlines()
     func: List[str] = []
     flag: bool = True
@@ -86,8 +86,8 @@ def check_single(func_lines: list, formula: str) -> bool:
     return False
 
 
-def check_single_formula(filename: str, func_name: str, formula: str) -> bool:
-    return check_single(get_func_lines(filename, func_name), formula)
+def check_single_formula(filename: str, func_name: str, formula: str, unique_id: str) -> bool:
+    return check_single(get_func_lines(filename, func_name, unique_id), formula)
 
 
 def get_tokens(formulas: List[str]) -> List[List[tokenize.TokenInfo]]:
@@ -122,8 +122,8 @@ def check_multiple(func_lines: List[str], formulas: List[str]) -> bool:
     return False
 
 
-def check_multiple_formulas(filename: str, func_name: str, formulas: List[str]) -> bool:
-    return check_multiple(get_func_lines(filename, func_name), formulas)
+def check_multiple_formulas(filename: str, func_name: str, formulas: List[str], unique_id: str) -> bool:
+    return check_multiple(get_func_lines(filename, func_name, unique_id), formulas)
 
 
 __all__ = ["check_multiple_formulas", "check_single_formula"]
