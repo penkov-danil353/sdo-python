@@ -72,5 +72,17 @@ P.S. строка подключения зависит от используе�
 
 # Credentials
 
-## Main developer
+## Server developer
 [Alexender Svobodov](https://github.com/sidecuter)
+
+## Teamleader
+[Kirill Osin](https://github.com/yourProgrammist)
+
+## Code check logic
+[Alexender Svobodov](https://github.com/sidecuter)
+[Markus](https://github.com/Barikus)
+
+## Other
+[Anagor](https://github.com/Anagor1102)
+Tommy
+
