@@ -29,10 +29,13 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./database:/var/lib/postgresql/data
+      - db-data:/var/lib/postgresql/data
     networks:
       front-tier:
         ipv4_address: 172.16.0.11
+
+volumes:
+  db-data:
 
 networks:
   front-tier:
