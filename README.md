@@ -68,7 +68,7 @@ P.S. строка подключения зависит от используе�
 - дайте скрипту права на выполнение
 ```chmod +x start.sh```
 - запустите скрипт
-```./start.x```
+```./start.sh```
 
 # Credentials
 
@@ -80,9 +80,11 @@ P.S. строка подключения зависит от используе�
 
 ## Code check logic
 [Alexender Svobodov](https://github.com/sidecuter)
+
 [Markus](https://github.com/Barikus)
 
 ## Other
 [Anagor](https://github.com/Anagor1102)
+
 Tommy
 
