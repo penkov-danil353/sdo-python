@@ -2,12 +2,14 @@ from base64 import b64encode
 from typing import Dict, Any, List, Type
 from fastapi import FastAPI, Body
 from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.encoders import jsonable_encoder
 from modules.database.dbconnector import *
 from modules.models.data_model import QueryData
 from modules.models.db_class import *
 from modules.test.test_main import *
 from modules.analize.check_symbols import *
+import json
 import os
 import shutil
 import random
@@ -15,7 +17,19 @@ import string
 import datetime
 
 
+with open("config.json", 'r') as config_file:
+    config_data = json.load(config_file)
+
+
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=config_data['origins'],
+    allow_credentials=config_data['credentials'],
+    allow_methods=config_data['methods'],
+    allow_headers=config_data['headers']
+)
 
 
 @app.get("/")
