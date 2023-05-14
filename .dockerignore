@@ -1,8 +1,6 @@
 .git/
 .idea/
 .gitignore
-trash/
-database/
 venv/
 **/.pytest_cache/
 docker-compose.yml
@@ -11,3 +9,4 @@ __pycache__/
 **/*.so
 **/*.o
 .github/
+config.json
