@@ -1,0 +1,12 @@
+{
+  "origins": [
+    "*"
+  ],
+  "credentials": true,
+  "methods": [
+    "*"
+  ],
+  "headers": [
+    "*"
+  ]
+}

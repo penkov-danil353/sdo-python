@@ -4,6 +4,4 @@ venv/
 __pycache__/
 **/*.dll
 **/.pytest_cache/
-database/
-trash/
 **/*.o
