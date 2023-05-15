@@ -19,7 +19,7 @@ def get_match(formula: str, lines: List[str]) -> List[str]:
             file_ops: List[str] = re.findall(pattern, line)
             file_ops.sort()
             if file_ops == f_ops:
-                matches.append(line.replace(" ", "").replace('\n', '').replace('\r', ''))
+                matches.append(''.join(line.split()))
     return matches
 
 
