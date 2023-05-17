@@ -1,8 +1,6 @@
 FROM alpine:edge as build
 WORKDIR /var/build
 
-RUN mkdir trash
-
 COPY cpp_libs/parser .
 
 RUN apk add g++ \
@@ -12,6 +10,8 @@ FROM alpine:edge
 LABEL authors="sidecuter"
 
 WORKDIR /var/server
+
+RUN mkdir trash
 
 COPY requirements.txt .
 
