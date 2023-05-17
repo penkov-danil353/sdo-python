@@ -1,6 +1,8 @@
 FROM alpine:edge as build
 WORKDIR /var/build
 
+RUN mkdir trash
+
 COPY cpp_libs/parser .
 
 RUN apk add g++ \
