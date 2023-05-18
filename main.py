@@ -44,7 +44,7 @@ async def get_tasks() -> JSONResponse:
     return JSONResponse(content=content)
 
 
-@app.get("/check/{id}")
+@app.post("/check/{id}")
 async def check_task(id, body=Body()) -> JSONResponse:
     unique_id: str = str(id) + ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(7))\
                      + datetime.datetime.now().strftime('%Y%m%d%H%M%S')
