@@ -51,7 +51,9 @@ async def check_task(id, body=Body()) -> JSONResponse:
     os.mkdir(f"./trash/{unique_id}")
     file: str = body["file"]
     test: Type[Test] = await get_test_by_id(id)
-    filename: str = "test_unit.py"
+    filename: str = "test_"+str(id) + ''.join(random.choice(string.ascii_lowercase + string.digits)
+                                              for _ in range(3)) + datetime.datetime.now().strftime('%Y%m%d%H%M%S') \
+                    + ".py"
     write_file(filename, file, unique_id)
     checks: Dict[str, List[Any]] = run_test(filename, test.functions, unique_id)
     lengths: List[Dict[str, int | bool | None]] = [
