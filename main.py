@@ -72,7 +72,7 @@ async def check_task(id, item: CheckModel) -> JSONResponse:
         {"test_results": output, "test_errors": error, "test_passed": checks, "lengths": lengths}))
 
 
-@app.post("/newtask")
+@app.post("/newtask", status_code=201)
 async def insert_task(item: QueryData) -> JSONResponse:
     try:
         answer: str = await insert_vals(item.lab_task)
