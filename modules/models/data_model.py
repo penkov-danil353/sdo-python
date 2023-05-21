@@ -50,5 +50,9 @@ class QueryData(BaseModel):
     lab_task: TestModel = Field(description="Test task")
 
 
+class CheckModel(BaseModel):
+    file: str = Field(description="File for checking")
+
+
 __all__ = ["TestModel", "CodeLengthModel", "ConstructionModel", "FunctionModel", "FormulaModel", "LinkedFormulaModel",
-           "TestCaseModel", "QueryData"]
+           "TestCaseModel", "QueryData", "CheckModel"]
