@@ -1,11 +1,11 @@
 from base64 import b64encode
 from typing import Dict, Any, List, Type
-from fastapi import FastAPI, Body
+from fastapi import FastAPI
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.encoders import jsonable_encoder
 from modules.database.dbconnector import *
-from modules.models.data_model import QueryData
+from modules.models.data_model import QueryData, CheckModel
 from modules.models.db_class import *
 from modules.test.test_main import *
 from modules.analize.check_symbols import *
@@ -32,9 +32,9 @@ app.add_middleware(
 )
 
 
-@app.get("/")
+@app.get("/", status_code=404)
 async def read_root() -> HTMLResponse:
-    html_content: str = "Nothing to see here"
+    html_content: str = "Error 404. Here is no page"
     return HTMLResponse(content=html_content, status_code=404)
 
 
@@ -45,11 +45,11 @@ async def get_tasks() -> JSONResponse:
 
 
 @app.post("/check/{id}")
-async def check_task(id, body=Body()) -> JSONResponse:
+async def check_task(id, item: CheckModel) -> JSONResponse:
     unique_id: str = str(id) + ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(7))\
                      + datetime.datetime.now().strftime('%Y%m%d%H%M%S')
     os.mkdir(f"./trash/{unique_id}")
-    file: str = body["file"]
+    file: str = item.file
     test: Type[Test] = await get_test_by_id(id)
     filename: str = "test_"+str(id) + ''.join(random.choice(string.ascii_lowercase + string.digits)
                                               for _ in range(3)) + datetime.datetime.now().strftime('%Y%m%d%H%M%S') \
@@ -72,10 +72,15 @@ async def check_task(id, body=Body()) -> JSONResponse:
         {"test_results": output, "test_errors": error, "test_passed": checks, "lengths": lengths}))
 
 
-@app.post("/newtask")
+@app.post("/newtask", status_code=201)
 async def insert_task(item: QueryData) -> JSONResponse:
     try:
         answer: str = await insert_vals(item.lab_task)
         return JSONResponse(content={"status": answer})
     except Exception as ex:
         return JSONResponse(content={"status": ex.__str__()}, status_code=400)
+
+
+@app.get("/{smth}", status_code=404)
+async def not_found(smth: str) -> HTMLResponse:
+    return HTMLResponse(content=f"Error 404, {smth} is not valid gateway", status_code=404)
