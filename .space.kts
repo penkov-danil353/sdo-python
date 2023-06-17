@@ -33,7 +33,7 @@ job("test") {
           """
       }
     }
-    container(displayName = "PyTest", image = "python3.10"){
+    container(displayName = "PyTest", image = "ubuntu"){
       shellScript {
           content = """
           	pip install -r requirements.txt
