@@ -26,10 +26,10 @@ job("test") {
           """
         }
     }
-    container(displayName = "PyTest", image = "python3.10"){
+    container(displayName = "PyTest", image = "ubuntu"){
       shellScript {
           content = """
-          	apt update -y && apt upgrade -y && apt install -y g++
+          	apt update -y && apt upgrade -y && apt install -y g++ python
           """
       }
     }
@@ -40,14 +40,14 @@ job("test") {
           """
       }
     }
-    container(displayName = "PyTest", image = "python3.10"){
+    container(displayName = "PyTest", image = "ubuntu"){
       shellScript {
           content = """
           	g++ -c -o cpp_libs/parser/library.o cpp_libs/parser/library.cpp -fPIC && g++ -shared -o cpp_libs/parser/libparse.so cpp_libs/parser/library.o
           """
       }
     }
-    container(displayName = "PyTest", image = "python3.10"){
+    container(displayName = "PyTest", image = "ubuntu"){
       shellScript {
           content = """
           	mv cpp_libs/parser/libparse.so /usr/lib
@@ -61,7 +61,7 @@ job("test") {
           """
       }
     }
-    container(displayName = "PyTest", image = "python3.10"){
+    container(displayName = "PyTest", image = "ubuntu"){
       shellScript {
           content = """
           	cd pytests && pytest
