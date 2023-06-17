@@ -18,7 +18,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: build dependencies
-        run: g++ -c -o cpp_libs/parser/library.o cpp_libs/parser/library.cpp -fPIC && g++ -shared -o modules/parse/libparse.so cpp_libs/parser/library.o
+        run: g++ -c -o cpp_libs/parser/library.o cpp_libs/parser/library.cpp -fPIC && g++ -shared -o pytests/libparse.so cpp_libs/parser/library.o
 
       - name: Test
         run: pytest pytests/
