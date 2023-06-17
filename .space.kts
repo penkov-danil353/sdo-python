@@ -32,26 +32,36 @@ job("test") {
           	apt update -y && apt upgrade -y && apt install -y g++
           """
       }
+    }
+    container(displayName = "PyTest", image = "python3.10"){
       shellScript {
           content = """
           	pip install -r requirements.txt
           """
       }
+    }
+    container(displayName = "PyTest", image = "python3.10"){
       shellScript {
           content = """
           	g++ -c -o cpp_libs/parser/library.o cpp_libs/parser/library.cpp -fPIC && g++ -shared -o cpp_libs/parser/libparse.so cpp_libs/parser/library.o
           """
       }
+    }
+    container(displayName = "PyTest", image = "python3.10"){
       shellScript {
           content = """
           	mv cpp_libs/parser/libparse.so /usr/lib
           """
       }
+    }
+    host("echo status"){
       shellScript {
           content = """
           	echo "run test"
           """
       }
+    }
+    container(displayName = "PyTest", image = "python3.10"){
       shellScript {
           content = """
           	cd pytests && pytest
