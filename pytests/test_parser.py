@@ -1,5 +1,8 @@
-from modules.parse.parsewrapper import calc_evaluation
+import sys
+import os
 import pytest
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from modules.parse.parsewrapper import calc_evaluation
 
 
 @pytest.mark.parametrize("evaluation, result", [("2+2", 4.0),
