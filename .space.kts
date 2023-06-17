@@ -29,7 +29,7 @@ job("test") {
     container(displayName = "PyTest", image = "ubuntu"){
       shellScript {
           content = """
-          	apt update -y && apt upgrade -y && apt install -y g++ python3
+          	apt update -y && apt upgrade -y && apt install -y g++ python3 python3-pip
           """
       }
     }
