@@ -15,56 +15,19 @@ job("test") {
     host("Run echo") {
     	shellScript {
           content = """
-          	echo "Start testing process..."
-          """
-        }
-    }
-    host("Run echo") {
-    	shellScript {
-          content = """
-          	echo "installing dependencies"
+          	echo "Start testing process..." &&\
+            echo "installing dependencies"
           """
         }
     }
     container(displayName = "PyTest", image = "ubuntu"){
       shellScript {
           content = """
-          	apt update -y && apt upgrade -y && apt install -y g++ python3 python3-pip
-          """
-      }
-    }
-    container(displayName = "PyTest", image = "ubuntu"){
-      shellScript {
-          content = """
-          	pip install -r requirements.txt
-          """
-      }
-    }
-    container(displayName = "PyTest", image = "ubuntu"){
-      shellScript {
-          content = """
-          	g++ -c -o cpp_libs/parser/library.o cpp_libs/parser/library.cpp -fPIC && g++ -shared -o cpp_libs/parser/libparse.so cpp_libs/parser/library.o
-          """
-      }
-    }
-    container(displayName = "PyTest", image = "ubuntu"){
-      shellScript {
-          content = """
-          	mv cpp_libs/parser/libparse.so /usr/lib
-          """
-      }
-    }
-    host("echo status"){
-      shellScript {
-          content = """
-          	echo "run test"
-          """
-      }
-    }
-    container(displayName = "PyTest", image = "ubuntu"){
-      shellScript {
-          content = """
-          	cd pytests && pytest
+          	apt update -y && apt upgrade -y && apt install -y g++ python3 python3-pip &&\
+            pip install -r requirements.txt &&\
+            g++ -c -o cpp_libs/parser/library.o cpp_libs/parser/library.cpp -fPIC && g++ -shared -o /usr/lib/libparse.so cpp_libs/parser/library.o &&\
+            echo "run test" &&\
+            cd pytests && pytest
           """
       }
     }
