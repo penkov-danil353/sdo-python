@@ -27,7 +27,7 @@ job("test") {
             pip install -r requirements.txt &&\
             g++ -c -o cpp_libs/parser/library.o cpp_libs/parser/library.cpp -fPIC && g++ -shared -o /usr/lib/libparse.so cpp_libs/parser/library.o &&\
             echo "run test" &&\
-            cd pytests && pytest
+            pytest pytests/
           """
       }
     }
