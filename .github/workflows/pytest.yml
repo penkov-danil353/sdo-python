@@ -21,7 +21,7 @@ jobs:
         run: g++ -c -o cpp_libs/parser/library.o cpp_libs/parser/library.cpp -fPIC && g++ -shared -o cpp_libs/parser/libparse.so cpp_libs/parser/library.o
 
       - name: move built dependencies
-        run: mv cpp_libs/parser/libparse.so /usr/lib/libparse.so
+        run: mv cpp_libs/parser/libparse.so ~/.local/lib/libparse.so
 
       - name: Test
         run: pytest pytests/
