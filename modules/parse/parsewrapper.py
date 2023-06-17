@@ -7,7 +7,10 @@ def calc_evaluation(evaluation: str) -> float:
     if platform.system() == "Windows":
         lib = ctypes.CDLL("./libparse.dll")
     else:
-        lib = ctypes.CDLL("libparse.so")
+        try:
+            lib = ctypes.CDLL("~/.local/lib/libparse.so")
+        except Exception as e:
+            lib = ctypes.CDLL("libparse.so")
     lib.calc_eval.argtypes = [ctypes.c_char_p, ]
     lib.calc_eval.restype = ctypes.c_double
     return lib.calc_eval(ctypes.c_char_p(evaluation.encode('utf-8')))
