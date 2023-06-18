@@ -8,7 +8,7 @@ job("test") {
   	startOn {
         gitPush {
             anyBranchMatching {
-                +"*/dev"
+                +"*dev"
             }
         }
     }
