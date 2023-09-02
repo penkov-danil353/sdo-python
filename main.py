@@ -9,6 +9,7 @@ from modules.models.data_model import QueryData, CheckModel
 from modules.models.db_class import *
 from modules.test.test_main import *
 from modules.analize.check_symbols import *
+from modules.models.output_models import *
 import json
 import os
 import shutil
@@ -44,7 +45,7 @@ async def get_tasks() -> JSONResponse:
     return JSONResponse(content=content)
 
 
-@app.post("/check/{id}")
+@app.post("/check/{id}", response_model=CheckResult)
 async def check_task(id, item: CheckModel) -> JSONResponse:
     unique_id: str = str(id) + ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(7))\
                      + datetime.datetime.now().strftime('%Y%m%d%H%M%S')

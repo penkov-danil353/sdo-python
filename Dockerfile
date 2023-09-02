@@ -16,7 +16,7 @@ RUN mkdir trash
 COPY requirements.txt .
 
 RUN apk add python3 py3-pip\
-    && python3 -m pip install -r requirements.txt
+    && python3 -m pip install -r requirements.txt --break-system-packages
 
 COPY --from=build /var/build/libparse.so /usr/lib
 COPY . .
