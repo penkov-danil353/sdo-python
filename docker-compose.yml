@@ -37,7 +37,9 @@ services:
 
 volumes:
   db-data:
+    external: true
   trash:
+    external: true
 
 networks:
   front-tier:
