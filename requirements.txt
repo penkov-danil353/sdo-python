@@ -4,3 +4,5 @@ pylint
 pytest
 uvicorn
 psycopg2-binary
+jwt
+passlib
