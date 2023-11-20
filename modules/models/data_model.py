@@ -1,6 +1,7 @@
 from typing import List, Any
 
 from pydantic import BaseModel, Field
+from typing import Literal
 
 
 class TestCaseModel(BaseModel):
@@ -41,8 +42,7 @@ class CodeLengthModel(BaseModel):
 class TestModel(BaseModel):
     task_text: str = Field(description="Task description", max_length=1024)
     functions: List[FunctionModel] | None = Field(default=None, description="Test case for function testing")
-    constructions: List[ConstructionModel] | None = Field(default=None,
-                                                          description="List of constructions for check")
+    constructions: List[ConstructionModel] | None = Field(default=None, description="List of constructions for check")
     length_checks: List[CodeLengthModel] | None = Field(default=None, description="Code length checks")
 
 
@@ -54,5 +54,46 @@ class CheckModel(BaseModel):
     file: str = Field(description="File for checking")
 
 
+class UserModel(BaseModel):
+    id: int = Field(description="User ID")
+    username: str = Field(description="User login")
+    password: str = Field(description="User password")
+    role: Literal["admin", "teacher", "student"] = Field(description="User role")
+
+
+class LoginRequestModel(BaseModel):
+    username: str = Field(description="User login")
+    password: str = Field(description="User password")
+
+
+class RegisterRequestModel(BaseModel):
+    username: str = Field(description="User login")
+    password: str = Field(description="User password")
+    group_id: int = Field(description="Students group ID")
+
+
+class UserResponseModel(BaseModel):
+    id: int = Field(description="User ID")
+    username: str = Field(description="User login")
+    role: Literal["admin", "teacher", "student"] = Field(description="User role")
+    access_token: str = Field(description="JWT token")
+
+
+class UserDashboardModel(BaseModel):
+    id: int = Field(description="User ID")
+    username: str = Field(description="User login")
+
+
+class StudyGroupRequestModel(BaseModel):
+    name: str = Field(description="Group name")
+
+
+class StudyGroupResponseModel(BaseModel):
+    id: int = Field(description="Group ID")
+    name: str = Field(description="Group name")
+
+
 __all__ = ["TestModel", "CodeLengthModel", "ConstructionModel", "FunctionModel", "FormulaModel", "LinkedFormulaModel",
-           "TestCaseModel", "QueryData", "CheckModel"]
+           "TestCaseModel", "QueryData", "CheckModel",
+           "UserModel", "UserResponseModel", "UserDashboardModel", "RegisterRequestModel", "LoginRequestModel",
+           "StudyGroupRequestModel", "StudyGroupResponseModel"]

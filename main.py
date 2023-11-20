@@ -1,14 +1,17 @@
 from base64 import b64encode
 from typing import Dict, Any, List, Type
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.encoders import jsonable_encoder
+
 from modules.database.dbconnector import *
-from modules.models.data_model import QueryData, CheckModel
+from modules.models.data_model import *
 from modules.models.db_class import *
 from modules.test.test_main import *
 from modules.analize.check_symbols import *
+from modules.account.jwt_impl import *
+from passlib.context import CryptContext
 import json
 import os
 import shutil
@@ -22,6 +25,7 @@ with open("config.json", 'r') as config_file:
 
 
 app = FastAPI()
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 app.add_middleware(
     CORSMiddleware,
@@ -36,6 +40,58 @@ app.add_middleware(
 async def read_root() -> HTMLResponse:
     html_content: str = "Error 404. Here is no page"
     return HTMLResponse(content=html_content, status_code=404)
+
+
+@app.post("/register", response_model=UserResponseModel)
+def create_user(user: RegisterRequestModel):
+    hashed_password = pwd_context.hash(user.password)
+    user_id = create_user_db(username=user.username, password=hashed_password, role='student', study_group_id=user.group_id)
+    payload = {"sub": user.username, "role": 'student'}
+    access_token = create_access_token(data=payload)
+    response = {
+        "id": user_id,
+        "username": user.username,
+        'role': 'student',
+        "access_token": access_token
+    }
+    return response
+
+
+@app.post("/login", response_model=UserResponseModel)
+def login_for_access_token(login_request: LoginRequestModel):
+    user = get_user_db(login_request.username)
+    if not user:
+        raise HTTPException(
+            status_code=401,
+            detail="Incorrect username",
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+    elif not pwd_context.verify(login_request.password, user.password):
+        raise HTTPException(
+            status_code=401,
+            detail="Incorrect password",
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+
+    payload = {"sub": user.username, "role": user.role}
+    access_token = create_access_token(data=payload)
+    response = {
+        "id": user.id,
+        "username": user.username,
+        "role": user.role,
+        "access_token": access_token
+    }
+    return response
+
+
+@app.get("/userDashboard", response_model=UserDashboardModel)
+def get_userDashboard(current_user: User = Depends(get_current_user)):
+    role = Roles[current_user.role]
+    if role == Roles.student:
+        response = UserDashboardModel(id=1, username='1')
+    elif role == Roles.teacher:
+        response = UserDashboardModel(id=2, username='2')
+    return response
 
 
 @app.get("/tasks")
@@ -68,17 +124,43 @@ async def check_task(id, item: CheckModel) -> JSONResponse:
             shutil.rmtree(directory)
         except Exception as e:
             print(e.__str__())
-    return JSONResponse(content=jsonable_encoder(
-        {"test_results": output, "test_errors": error, "test_passed": checks, "lengths": lengths}))
+    response = {
+        "test_results": output,
+        "test_errors": error,
+        "test_passed": checks,
+        "lengths": lengths
+    }
+    return JSONResponse(content=jsonable_encoder(response))
 
 
 @app.post("/newtask", status_code=201)
 async def insert_task(item: QueryData) -> JSONResponse:
     try:
         answer: str = await insert_vals(item.lab_task)
-        return JSONResponse(content={"status": answer})
+        response = {
+            "status": answer
+        }
+        return JSONResponse(content=response)
     except Exception as ex:
-        return JSONResponse(content={"status": ex.__str__()}, status_code=400)
+        response = {
+            "status": ex.__str__()
+        }
+        return JSONResponse(content=response, status_code=400)
+
+
+@app.post("/create_students_group", status_code=201, response_model=StudyGroupResponseModel)
+async def create_students_group(payload: StudyGroupRequestModel):
+    group_id = create_students_group_db(payload.name)
+    response = {
+        "id": group_id,
+        "name": payload.name
+    }
+    return response
+
+
+@app.get("/get_students_groups", response_model=List[StudyGroupResponseModel])
+async def get_students_groups():
+    return get_students_groups_db()
 
 
 @app.get("/{smth}", status_code=404)
