@@ -84,13 +84,29 @@ def login_for_access_token(login_request: LoginRequestModel):
     return response
 
 
-@app.get("/userDashboard", response_model=UserDashboardModel)
+@app.get("/user_dashboard", response_model=UserDashboardModel)
 def get_userDashboard(current_user: User = Depends(get_current_user)):
     role = Roles[current_user.role]
-    if role == Roles.student:
-        response = UserDashboardModel(id=1, username='1')
-    elif role == Roles.teacher:
-        response = UserDashboardModel(id=2, username='2')
+    if role != Roles.student:
+        raise HTTPException(
+            status_code=403,
+            detail="Access Denied",
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+    response = UserDashboardModel(id=2, username='tst')
+    return response
+
+
+@app.get("/teacher_dashboard", response_model=TeacherDashboardModel)
+def get_teacherDashboard(current_user: User = Depends(get_current_user)):
+    role = Roles[current_user.role]
+    if role != Roles.teacher:
+        raise HTTPException(
+            status_code=403,
+            detail="Access Denied",
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+    response = TeacherDashboardModel(id=1, username='tst')
     return response
 
 

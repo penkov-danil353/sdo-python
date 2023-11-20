@@ -84,6 +84,11 @@ class UserDashboardModel(BaseModel):
     username: str = Field(description="User login")
 
 
+class TeacherDashboardModel(BaseModel):
+    id: int = Field(description="User ID")
+    username: str = Field(description="User login")
+
+
 class StudyGroupRequestModel(BaseModel):
     name: str = Field(description="Group name")
 
@@ -95,5 +100,5 @@ class StudyGroupResponseModel(BaseModel):
 
 __all__ = ["TestModel", "CodeLengthModel", "ConstructionModel", "FunctionModel", "FormulaModel", "LinkedFormulaModel",
            "TestCaseModel", "QueryData", "CheckModel",
-           "UserModel", "UserResponseModel", "UserDashboardModel", "RegisterRequestModel", "LoginRequestModel",
+           "UserModel", "UserResponseModel", "UserDashboardModel", "RegisterRequestModel", "LoginRequestModel", "TeacherDashboardModel",
            "StudyGroupRequestModel", "StudyGroupResponseModel"]
