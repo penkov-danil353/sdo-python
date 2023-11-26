@@ -1,4 +1,4 @@
-from typing import Type, List
+from typing import Type, List, Optional
 
 from time import sleep
 
@@ -10,9 +10,53 @@ from modules.models.data_model import *
 import os
 
 # sleep(15)
-sqlite_database = os.environ.get("DB_CON", "sqlite:///database/test.db")
+sqlite_database = os.environ.get("DB_CON")
 engine = create_engine(sqlite_database, echo=True)
 Base.metadata.create_all(bind=engine)
+
+
+def create_user_db(username, password, role, study_group_id) -> int:
+    role_enum = Roles[role.lower()]
+    user = User(username=username, password=password, role=role_enum, study_group_id=study_group_id)
+    with Session(autoflush=False, bind=engine) as db:
+        db.add(user)
+        db.flush()
+        user_id = user.id
+        db.commit()
+    return user_id
+
+
+def get_user_db(username: str) -> Optional[UserModel]:
+    with Session(autoflush=False, bind=engine) as db:
+        user_record = db.query(User).filter(User.username == username).first()
+
+        if not user_record:
+            return None
+
+        print(user_record)
+        user = UserModel(
+            id=user_record.id,
+            username=user_record.username,
+            password=user_record.password,
+            role=user_record.role.name
+        )
+        return user
+
+
+def create_students_group_db(name: str) -> int:
+    group = StudyGroup(name=name)
+    with Session(autoflush=False, bind=engine) as db:
+        db.add(group)
+        db.flush()
+        group_id = group.id
+        db.commit()
+    return group_id
+
+
+def get_students_groups_db() -> List:
+    with Session(autoflush=False, bind=engine) as db:
+        study_groups = db.query(StudyGroup).all()
+        return study_groups
 
 
 async def add_data(*args: Test) -> None:
@@ -75,4 +119,4 @@ async def insert_vals(data: TestModel) -> str:
     return "success"
 
 
-__all__ = ["get_all_tests", "get_test_by_id", "insert_vals"]
+__all__ = ["get_all_tests", "get_test_by_id", "insert_vals", "create_user_db", "get_user_db", "create_students_group_db", "get_students_groups_db"]

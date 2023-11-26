@@ -8,5 +8,6 @@
   ],
   "headers": [
     "*"
-  ]
+  ],
+  "secret_key": "test"
 }
