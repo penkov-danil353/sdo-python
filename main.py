@@ -246,7 +246,7 @@ async def insert_task(item: QueryData) -> JSONResponse:
 
 @app.post("/create_students_group", status_code=201, response_model=StudyGroupResponseModel)
 async def create_students_group(payload: StudyGroupRequestModel):
-    group_id = await create_students_group_db(payload.name)
+    group_id = create_students_group_db(payload.name)
     response = {
         "id": group_id,
         "name": payload.name
