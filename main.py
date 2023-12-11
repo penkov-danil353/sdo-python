@@ -134,6 +134,60 @@ async def get_task_info(test_id: int, current_user: User = Depends(get_current_u
     return response
 
 
+@app.get("/full_test_info/{test_id}")
+async def get_task_info(test_id: int, current_user: User = Depends(get_current_user)) -> TestModel:
+    role = Roles[current_user.role]
+    if role != Roles.teacher:
+        raise HTTPException(
+            status_code=403,
+            detail="Access Denied",
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+    test_info = await get_test_by_id(test_id)
+
+    functions = []
+    for function in test_info.functions:
+        test_cases = []
+        input_data = []
+        sorted_data = sorted(function.datas, key=lambda x: x.data_pose if x.data_pose != -1 else float('inf'))
+
+        for data in sorted_data:
+            if data.data_pose != -1:
+                input_data.append(data.data)
+            else:
+                test_cases.append(TestCaseModel(input=input_data, output=data.data))
+                input_data = []
+
+        formulas = [FormulaModel(id=formula.id, formula=formula.formula) for formula in function.formulas]
+
+        #linked_formulas = [LinkedFormulaModel(
+        #    id=linked_formula.id,
+        #    description=linked_formula.description,
+        #    formula_ids=linked_formula.formula_ids)
+        #    for linked_formula in function.linked_formulas
+        #]
+
+        functions.append(FunctionModel(
+            name=function.func_name,
+            test_cases=test_cases,
+            formulas=formulas,
+        #    linked_formulas=linked_formulas
+        ))
+
+    constructions = [ConstructionModel(name=construction.name, state=construction.state) for construction in
+                     test_info.constructions] if test_info.constructions else None
+    length_checks = [CodeLengthModel(symbols=length.symbols, rows=length.rows) for length in
+                     test_info.lengths] if test_info.lengths else None
+
+    response = TestModel(
+        task_text=test_info.description,
+        functions=functions,
+        constructions=constructions,
+        length_checks=length_checks
+    )
+    return response
+
+
 @app.post("/check/{test_id}")
 async def check_task(test_id: int, item: CheckModel, current_user: User = Depends(get_current_user)) -> JSONResponse:
     unique_id: str = str(test_id) + ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(7)) \

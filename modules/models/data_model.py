@@ -10,7 +10,7 @@ class TestCaseModel(BaseModel):
 
 
 class FormulaModel(BaseModel):
-    id: str = Field(description="Formula id for linking")
+    id: int = Field(description="Formula id for linking")
     description: str | None = Field(default=None, title="Description of function")
     formula: str = Field(description="Formula")
 
