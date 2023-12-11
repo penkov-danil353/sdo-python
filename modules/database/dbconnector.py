@@ -4,6 +4,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from sqlalchemy.future import select
 
+from passlib.context import CryptContext
+
 from modules.models.data_model import TestResultModel
 from modules.models.db_class import *
 from modules.models.data_model import *
@@ -14,8 +16,10 @@ sqlite_database = os.environ.get("DB_CON")
 engine = create_engine(sqlite_database, echo=True)
 Base.metadata.create_all(bind=engine)
 
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-def create_user_db(username, password, role, study_group_id) -> int:
+
+def create_user_db(username, password, role, study_group_id=None) -> int:
     role_enum = Roles[role.lower()]
     user = User(username=username, password=password, role=role_enum, study_group_id=study_group_id)
     with Session(autoflush=False, bind=engine) as db:
@@ -42,7 +46,7 @@ def get_user_db(username: str) -> Optional[UserModel]:
         return user
 
 
-async def create_students_group_db(name: str) -> int:
+def create_students_group_db(name: str) -> int:
     group = StudyGroup(name=name)
     with Session(autoflush=False, bind=engine) as db:
         db.add(group)
@@ -62,7 +66,7 @@ async def save_test_result(user_id: int, test_id: int, test_results: dict) -> in
     return attempt_id
 
 
-async def get_students_groups_db() -> List:
+def get_students_groups_db() -> List:
     with Session(autoflush=False, bind=engine) as db:
         study_groups = db.query(StudyGroup).all()
         return study_groups
@@ -148,4 +152,16 @@ async def insert_vals(data: TestModel) -> str:
     return "success"
 
 
-__all__ = ["get_all_tests", "get_test_by_id", "insert_vals", "create_user_db", "get_user_db", "create_students_group_db", "get_students_groups_db", "save_test_result", "get_user_test_attempts"]
+def init_test_db_data() -> None:
+    if len(get_students_groups_db()) < 2:
+        create_students_group_db('222-330')
+        create_students_group_db('222-331')
+    if not get_user_db('user'):
+        hashed_password = pwd_context.hash('user')
+        create_user_db(username='user', password=hashed_password, role='student', study_group_id=1)
+    if not get_user_db('admin'):
+        hashed_password = pwd_context.hash('admin')
+        create_user_db(username='admin', password=hashed_password, role='teacher')
+
+
+__all__ = ["init_test_db_data", "get_all_tests", "get_test_by_id", "insert_vals", "create_user_db", "get_user_db", "create_students_group_db", "get_students_groups_db", "save_test_result", "get_user_test_attempts"]

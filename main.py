@@ -35,6 +35,8 @@ app.add_middleware(
     allow_headers=config_data['headers']
 )
 
+init_test_db_data()
+
 
 @app.get("/", status_code=404)
 async def read_root() -> HTMLResponse:
@@ -254,7 +256,7 @@ async def create_students_group(payload: StudyGroupRequestModel):
 
 @app.get("/get_students_groups", response_model=List[StudyGroupResponseModel])
 async def get_students_groups():
-    return await get_students_groups_db()
+    return get_students_groups_db()
 
 
 @app.get("/{smth}", status_code=404)
