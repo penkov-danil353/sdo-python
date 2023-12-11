@@ -10,3 +10,5 @@ __pycache__/
 **/*.o
 .github/
 pytests/
+database/tst.db
+trash/
