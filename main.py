@@ -122,7 +122,7 @@ async def get_tasks() -> JSONResponse:
     return JSONResponse(content=content)
 
 
-@app.get("/tasks/{test_id}")
+@app.get("/task/{test_id}")
 async def get_task_info(test_id: int, current_user: User = Depends(get_current_user)) -> TestInfoModel:
     test_info = await get_test_by_id(test_id)
     results = get_user_test_attempts(user_id=current_user.id, test_id=test_id)
