@@ -91,8 +91,14 @@ def get_user_test_attempts(user_id: int, test_id: int) -> List[TestResultModel]:
             )
         )
         test_results = result.scalars().all()
-        return [TestResultModel.from_orm(test_result) for test_result in test_results]
-
+        return [
+            TestResultModel(
+                id=test_result.id,
+                user_id=test_result.user_id,
+                test_id=test_result.test_id,
+                test_results=test_result.test_results
+            ) for test_result in test_results
+        ]
 
 
 async def get_test_by_id(id_val: int) -> Type[Test]:

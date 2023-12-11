@@ -52,10 +52,6 @@ class TestResultModel(BaseModel):
     test_id: int = Field(description="Test ID")
     test_results: dict = Field(description="Test result structure")
 
-    class Config:
-        orm_mode = True
-        from_attributes = True
-
 
 class TestInfoModel(BaseModel):
     id: int = Field(description="Test ID")
