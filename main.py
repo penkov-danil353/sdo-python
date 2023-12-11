@@ -85,7 +85,7 @@ def login_for_access_token(login_request: LoginRequestModel):
 
 
 @app.get("/user_dashboard", response_model=UserDashboardModel)
-def get_userDashboard(current_user: User = Depends(get_current_user)):
+def get_user_dashboard(current_user: User = Depends(get_current_user)):
     role = Roles[current_user.role]
     if role != Roles.student:
         raise HTTPException(
@@ -93,12 +93,15 @@ def get_userDashboard(current_user: User = Depends(get_current_user)):
             detail="Access Denied",
             headers={"WWW-Authenticate": "Bearer"}
         )
-    response = UserDashboardModel(id=2, username='tst')
+    response = UserDashboardModel(
+        id=current_user.id,
+        username=current_user.username
+    )
     return response
 
 
 @app.get("/teacher_dashboard", response_model=TeacherDashboardModel)
-def get_teacherDashboard(current_user: User = Depends(get_current_user)):
+def get_teacher_dashboard(current_user: User = Depends(get_current_user)):
     role = Roles[current_user.role]
     if role != Roles.teacher:
         raise HTTPException(
@@ -106,7 +109,10 @@ def get_teacherDashboard(current_user: User = Depends(get_current_user)):
             detail="Access Denied",
             headers={"WWW-Authenticate": "Bearer"}
         )
-    response = TeacherDashboardModel(id=1, username='tst')
+    response = TeacherDashboardModel(
+        id=current_user.id,
+        username=current_user.username
+    )
     return response
 
 
@@ -116,26 +122,38 @@ async def get_tasks() -> JSONResponse:
     return JSONResponse(content=content)
 
 
-@app.post("/check/{id}")
-async def check_task(id, item: CheckModel) -> JSONResponse:
-    unique_id: str = str(id) + ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(7))\
+@app.get("/tasks/{test_id}")
+async def get_task_info(test_id: int, current_user: User = Depends(get_current_user)) -> TestInfoModel:
+    test_info = await get_test_by_id(test_id)
+    results = get_user_test_attempts(user_id=current_user.id, test_id=test_id)
+    response = TestInfoModel(
+         id=test_info.id,
+         description=test_info.description,
+         attempts=results
+    )
+    return response
+
+
+@app.post("/check/{test_id}")
+async def check_task(test_id: int, item: CheckModel, current_user: User = Depends(get_current_user)) -> JSONResponse:
+    unique_id: str = str(test_id) + ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(7)) \
                      + datetime.datetime.now().strftime('%Y%m%d%H%M%S')
-    os.mkdir(f"./trash/{unique_id}")
+    os.mkdir(f"trash/{unique_id}")
     file: str = item.file
-    test: Type[Test] = await get_test_by_id(id)
-    filename: str = "test_"+str(id) + ''.join(random.choice(string.ascii_lowercase + string.digits)
-                                              for _ in range(3)) + datetime.datetime.now().strftime('%Y%m%d%H%M%S') \
+    test: Type[Test] = await get_test_by_id(test_id)
+    filename: str = "test_" + str(test_id) + ''.join(random.choice(string.ascii_lowercase + string.digits)
+                                                     for _ in range(3)) + datetime.datetime.now().strftime('%Y%m%d%H%M%S') \
                     + ".py"
     write_file(filename, file, unique_id)
     checks: Dict[str, List[Any]] = run_test(filename, test.functions, unique_id)
     lengths: List[Dict[str, int | bool | None]] = [
         check_symbols(filename, length, unique_id) for length in test.lengths
     ]
-    with open(f"./trash/{unique_id}/output.xml", "rb") as export_file:
+    with open(f"trash/{unique_id}/output.xml", "rb") as export_file:
         output: str = b64encode(export_file.read()).decode('utf-8')
-    with open(f"./trash/{unique_id}/errors.txt", "rb") as export_file:
+    with open(f"trash/{unique_id}/errors.txt", "rb") as export_file:
         error: str = b64encode(export_file.read()).decode('utf-8')
-    for directory in ["./.pytest_cache", "./__pycache__", f"./trash/{unique_id}"]:
+    for directory in [".pytest_cache", "__pycache__", f"trash/{unique_id}"]:
         try:
             shutil.rmtree(directory)
         except Exception as e:
@@ -146,6 +164,12 @@ async def check_task(id, item: CheckModel) -> JSONResponse:
         "test_passed": checks,
         "lengths": lengths
     }
+    attempt_id = await save_test_result(
+        user_id=current_user.id,
+        test_id=test_id,
+        test_results=response
+    )
+    response['attempt_id'] = attempt_id
     return JSONResponse(content=jsonable_encoder(response))
 
 
@@ -166,7 +190,7 @@ async def insert_task(item: QueryData) -> JSONResponse:
 
 @app.post("/create_students_group", status_code=201, response_model=StudyGroupResponseModel)
 async def create_students_group(payload: StudyGroupRequestModel):
-    group_id = create_students_group_db(payload.name)
+    group_id = await create_students_group_db(payload.name)
     response = {
         "id": group_id,
         "name": payload.name
@@ -176,7 +200,7 @@ async def create_students_group(payload: StudyGroupRequestModel):
 
 @app.get("/get_students_groups", response_model=List[StudyGroupResponseModel])
 async def get_students_groups():
-    return get_students_groups_db()
+    return await get_students_groups_db()
 
 
 @app.get("/{smth}", status_code=404)

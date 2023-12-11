@@ -1,15 +1,15 @@
 from typing import Type, List, Optional
 
-from time import sleep
-
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
+from sqlalchemy.future import select
+
+from modules.models.data_model import TestResultModel
 from modules.models.db_class import *
 from modules.models.data_model import *
 
 import os
 
-# sleep(15)
 sqlite_database = os.environ.get("DB_CON")
 engine = create_engine(sqlite_database, echo=True)
 Base.metadata.create_all(bind=engine)
@@ -33,7 +33,6 @@ def get_user_db(username: str) -> Optional[UserModel]:
         if not user_record:
             return None
 
-        print(user_record)
         user = UserModel(
             id=user_record.id,
             username=user_record.username,
@@ -43,7 +42,7 @@ def get_user_db(username: str) -> Optional[UserModel]:
         return user
 
 
-def create_students_group_db(name: str) -> int:
+async def create_students_group_db(name: str) -> int:
     group = StudyGroup(name=name)
     with Session(autoflush=False, bind=engine) as db:
         db.add(group)
@@ -53,10 +52,21 @@ def create_students_group_db(name: str) -> int:
     return group_id
 
 
-def get_students_groups_db() -> List:
+async def save_test_result(user_id: int, test_id: int, test_results: dict) -> int:
+    record = TestResult(user_id=user_id, test_id=test_id, test_results=test_results)
+    with Session(autoflush=False, bind=engine) as db:
+        db.add(record)
+        db.flush()
+        attempt_id = record.id
+        db.commit()
+    return attempt_id
+
+
+async def get_students_groups_db() -> List:
     with Session(autoflush=False, bind=engine) as db:
         study_groups = db.query(StudyGroup).all()
         return study_groups
+
 
 
 async def add_data(*args: Test) -> None:
@@ -72,6 +82,19 @@ async def get_all_tests() -> List[Type[Test]]:
         return tests
 
 
+def get_user_test_attempts(user_id: int, test_id: int) -> List[TestResultModel]:
+    with Session(autoflush=False, bind=engine) as db:
+        result = db.execute(
+            select(TestResult).where(
+                TestResult.user_id == user_id,
+                TestResult.test_id == test_id
+            )
+        )
+        test_results = result.scalars().all()
+        return [TestResultModel.from_orm(test_result) for test_result in test_results]
+
+
+
 async def get_test_by_id(id_val: int) -> Type[Test]:
     with Session(autoflush=False, bind=engine) as db:
         test_val: Type[Test] = db.query(Test).filter(Test.id == id_val).first()
@@ -81,7 +104,7 @@ async def get_test_by_id(id_val: int) -> Type[Test]:
             function.formulas
         test_val.lengths
         test_val.constructions
-        return test_val
+    return test_val
 
 
 async def insert_vals(data: TestModel) -> str:
@@ -119,4 +142,4 @@ async def insert_vals(data: TestModel) -> str:
     return "success"
 
 
-__all__ = ["get_all_tests", "get_test_by_id", "insert_vals", "create_user_db", "get_user_db", "create_students_group_db", "get_students_groups_db"]
+__all__ = ["get_all_tests", "get_test_by_id", "insert_vals", "create_user_db", "get_user_db", "create_students_group_db", "get_students_groups_db", "save_test_result", "get_user_test_attempts"]

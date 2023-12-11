@@ -2,7 +2,7 @@ import enum
 from datetime import datetime
 from typing import List
 from sqlalchemy.orm import DeclarativeBase, relationship, mapped_column, Mapped
-from sqlalchemy import Integer, String, ForeignKey, Text, DateTime, Enum
+from sqlalchemy import Integer, String, ForeignKey, Text, DateTime, Enum, JSON
 from sqlalchemy import ForeignKey
 
 
@@ -106,10 +106,11 @@ class TestResult(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('User.id'), nullable=False)
     test_id: Mapped[int] = mapped_column(Integer, ForeignKey('Test.id'), nullable=False)
-    test_results: Mapped[str] = mapped_column(Text, nullable=False)
-    test_errors: Mapped[str] = mapped_column(Text, nullable=False)
-    test_passed: Mapped[str] = mapped_column(Text, nullable=False)
-    lengths: Mapped[str] = mapped_column(Text, nullable=False)
+    test_results: Mapped[dict] = mapped_column(JSON, nullable=False)
+    #test_results: Mapped[str] = mapped_column(Text, nullable=False)
+    #test_errors: Mapped[str] = mapped_column(Text, nullable=False)
+    #test_passed: Mapped[str] = mapped_column(Text, nullable=False)
+    #lengths: Mapped[str] = mapped_column(Text, nullable=False)
     user: Mapped[User] = relationship("User", back_populates="test_results")
     test: Mapped[Test] = relationship("Test")
 

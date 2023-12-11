@@ -1,5 +1,5 @@
 from typing import List, Any
-
+from .db_class import TestResult
 from pydantic import BaseModel, Field
 from typing import Literal
 
@@ -44,6 +44,23 @@ class TestModel(BaseModel):
     functions: List[FunctionModel] | None = Field(default=None, description="Test case for function testing")
     constructions: List[ConstructionModel] | None = Field(default=None, description="List of constructions for check")
     length_checks: List[CodeLengthModel] | None = Field(default=None, description="Code length checks")
+
+
+class TestResultModel(BaseModel):
+    id: int = Field(description="Attempt ID")
+    user_id: int = Field(description="User ID")
+    test_id: int = Field(description="Test ID")
+    test_results: dict = Field(description="Test result structure")
+
+    class Config:
+        orm_mode = True
+        from_attributes = True
+
+
+class TestInfoModel(BaseModel):
+    id: int = Field(description="Test ID")
+    description: str = Field(description="Test description", max_length=1024)
+    attempts: List[TestResultModel]
 
 
 class QueryData(BaseModel):
@@ -98,7 +115,7 @@ class StudyGroupResponseModel(BaseModel):
     name: str = Field(description="Group name")
 
 
-__all__ = ["TestModel", "CodeLengthModel", "ConstructionModel", "FunctionModel", "FormulaModel", "LinkedFormulaModel",
+__all__ = ["TestModel", "TestInfoModel", "CodeLengthModel", "ConstructionModel", "FunctionModel", "FormulaModel", "LinkedFormulaModel",
            "TestCaseModel", "QueryData", "CheckModel",
            "UserModel", "UserResponseModel", "UserDashboardModel", "RegisterRequestModel", "LoginRequestModel", "TeacherDashboardModel",
            "StudyGroupRequestModel", "StudyGroupResponseModel"]
