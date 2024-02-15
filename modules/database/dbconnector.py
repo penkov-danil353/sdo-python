@@ -22,8 +22,11 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def create_user_db(username, password, role, study_group_name=None) -> int:
     role_enum = Roles[role.lower()]
-    study_group_id = get_or_create_study_group(name=study_group_name)
-    user = User(username=username, password=password, role=role_enum, study_group_id=study_group_id)
+    if study_group_name:
+        study_group_id = get_or_create_study_group(name=study_group_name)
+        user = User(username=username, password=password, role=role_enum, study_group_id=study_group_id)
+    else:
+        user = User(username=username, password=password, role=role_enum)
     with Session(autoflush=False, bind=engine) as db:
         db.add(user)
         db.flush()
