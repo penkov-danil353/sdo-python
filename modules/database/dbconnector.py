@@ -157,12 +157,9 @@ async def insert_vals(data: TestModel) -> str:
 
 
 def init_test_db_data() -> None:
-    if len(get_students_groups_db()) < 2:
-        get_or_create_study_group(name='222-330')
-        get_or_create_study_group(name='222-331')
     if not get_user_db('user'):
         hashed_password = pwd_context.hash('user')
-        create_user_db(username='user', password=hashed_password, role='student', study_group_id=1)
+        create_user_db(username='user', password=hashed_password, role='student', study_group_name='222-330')
     if not get_user_db('admin'):
         hashed_password = pwd_context.hash('admin')
         create_user_db(username='admin', password=hashed_password, role='teacher')
