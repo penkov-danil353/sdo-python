@@ -11,12 +11,14 @@ LABEL authors="sidecuter"
 
 WORKDIR /var/server
 
-RUN mkdir trash
+RUN apk add --no-cache python3 py3-pip python3-dev build-base libffi-dev \
+    && python3 -m venv venv \
 
+ENV PATH="/var/server/venv/bin:$PATH"
 COPY requirements.txt .
-
-RUN apk add python3 py3-pip\
-    && python3 -m pip install -r requirements.txt
+RUN pip install --upgrade pip \
+    && pip install -r requirements.txt \
 
 COPY --from=build /var/build/libparse.so /usr/lib
+
 COPY . .
