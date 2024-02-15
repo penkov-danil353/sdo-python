@@ -119,10 +119,23 @@ def get_teacher_dashboard(current_user: User = Depends(get_current_user)):
     return response
 
 
-@app.get("/tasks")
-async def get_tasks() -> JSONResponse:
+@app.get(
+    "/tasks",
+    response_class=JSONResponse,
+    responses={
+        200: {
+            "description": "Возвращает словарь, где ключи — это ID тестов, а значения — их названия.",
+            "content": {
+                "application/json": {
+                    "example": {"1": "tst1", "2": "qq"}
+                }
+            }
+        }
+    }
+)
+async def get_tasks() -> Dict[str, str]:
     content: Dict[str, str] = {str(test.id): test.description for test in await get_all_tests()}
-    return JSONResponse(content=content)
+    return content
 
 
 @app.get("/task/{test_id}")
@@ -243,6 +256,7 @@ async def insert_task(item: QueryData) -> JSONResponse:
             "status": ex.__str__()
         }
         return JSONResponse(content=response, status_code=400)
+
 
 @app.get("/get_students_groups", response_model=List[StudyGroupResponseModel])
 async def get_students_groups():
