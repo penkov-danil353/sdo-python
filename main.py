@@ -127,7 +127,7 @@ def get_teacher_dashboard(current_user: User = Depends(get_current_user)):
             "description": "Возвращает словарь, где ключи — это ID тестов, а значения — их названия.",
             "content": {
                 "application/json": {
-                    "example": {"1": "tst1", "2": "qq"}
+                    "example": {"1": "Работа с переменными", "2": "Работа с алгебраическими выражениями"}
                 }
             }
         }
