@@ -47,7 +47,7 @@ async def read_root() -> HTMLResponse:
 @app.post("/register", response_model=UserResponseModel)
 def create_user(user: RegisterRequestModel):
     hashed_password = pwd_context.hash(user.password)
-    user_id = create_user_db(username=user.username, password=hashed_password, role='student', study_group_id=user.group_id)
+    user_id = create_user_db(username=user.username, password=hashed_password, role='student', study_group_name=user.group_name)
     payload = {"sub": user.username, "role": 'student'}
     access_token = create_access_token(data=payload)
     response = {
@@ -88,6 +88,7 @@ def login_for_access_token(login_request: LoginRequestModel):
 
 @app.get("/user_dashboard", response_model=UserDashboardModel)
 def get_user_dashboard(current_user: User = Depends(get_current_user)):
+    print(current_user)
     role = Roles[current_user.role]
     if role != Roles.student:
         raise HTTPException(
@@ -242,17 +243,6 @@ async def insert_task(item: QueryData) -> JSONResponse:
             "status": ex.__str__()
         }
         return JSONResponse(content=response, status_code=400)
-
-
-@app.post("/create_students_group", status_code=201, response_model=StudyGroupResponseModel)
-async def create_students_group(payload: StudyGroupRequestModel):
-    group_id = create_students_group_db(payload.name)
-    response = {
-        "id": group_id,
-        "name": payload.name
-    }
-    return response
-
 
 @app.get("/get_students_groups", response_model=List[StudyGroupResponseModel])
 async def get_students_groups():

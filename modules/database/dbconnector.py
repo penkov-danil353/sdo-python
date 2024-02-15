@@ -3,6 +3,7 @@ from typing import Type, List, Optional
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from sqlalchemy.future import select
+from sqlalchemy.exc import NoResultFound
 
 from passlib.context import CryptContext
 
@@ -19,8 +20,9 @@ Base.metadata.create_all(bind=engine)
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-def create_user_db(username, password, role, study_group_id=None) -> int:
+def create_user_db(username, password, role, study_group_name=None) -> int:
     role_enum = Roles[role.lower()]
+    study_group_id = get_or_create_study_group(name=study_group_name)
     user = User(username=username, password=password, role=role_enum, study_group_id=study_group_id)
     with Session(autoflush=False, bind=engine) as db:
         db.add(user)
@@ -46,16 +48,6 @@ def get_user_db(username: str) -> Optional[UserModel]:
         return user
 
 
-def create_students_group_db(name: str) -> int:
-    group = StudyGroup(name=name)
-    with Session(autoflush=False, bind=engine) as db:
-        db.add(group)
-        db.flush()
-        group_id = group.id
-        db.commit()
-    return group_id
-
-
 async def save_test_result(user_id: int, test_id: int, test_results: dict) -> int:
     record = TestResult(user_id=user_id, test_id=test_id, test_results=test_results)
     with Session(autoflush=False, bind=engine) as db:
@@ -64,6 +56,18 @@ async def save_test_result(user_id: int, test_id: int, test_results: dict) -> in
         attempt_id = record.id
         db.commit()
     return attempt_id
+
+
+def get_or_create_study_group(name: str) -> int:
+    with Session(autoflush=False, bind=engine) as db:
+        try:
+            study_group = db.query(StudyGroup).filter(StudyGroup.name == name).one()
+        except NoResultFound:
+            study_group = StudyGroup(name=name)
+            db.add(study_group)
+            db.flush()
+            db.commit()
+        return study_group.id
 
 
 def get_students_groups_db() -> List:
@@ -154,8 +158,8 @@ async def insert_vals(data: TestModel) -> str:
 
 def init_test_db_data() -> None:
     if len(get_students_groups_db()) < 2:
-        create_students_group_db('222-330')
-        create_students_group_db('222-331')
+        get_or_create_study_group(name='222-330')
+        get_or_create_study_group(name='222-331')
     if not get_user_db('user'):
         hashed_password = pwd_context.hash('user')
         create_user_db(username='user', password=hashed_password, role='student', study_group_id=1)
@@ -164,4 +168,4 @@ def init_test_db_data() -> None:
         create_user_db(username='admin', password=hashed_password, role='teacher')
 
 
-__all__ = ["init_test_db_data", "get_all_tests", "get_test_by_id", "insert_vals", "create_user_db", "get_user_db", "create_students_group_db", "get_students_groups_db", "save_test_result", "get_user_test_attempts"]
+__all__ = ["init_test_db_data", "get_all_tests", "get_test_by_id", "insert_vals", "create_user_db", "get_user_db", "get_or_create_study_group", "get_students_groups_db", "save_test_result", "get_user_test_attempts"]

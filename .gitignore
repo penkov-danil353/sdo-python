@@ -5,3 +5,6 @@ __pycache__/
 **/*.dll
 **/.pytest_cache/
 **/*.o
+test.py
+trash/
+database/

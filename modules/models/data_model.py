@@ -82,7 +82,7 @@ class LoginRequestModel(BaseModel):
 class RegisterRequestModel(BaseModel):
     username: str = Field(description="User login")
     password: str = Field(description="User password")
-    group_id: int = Field(description="Students group ID")
+    group_name: str = Field(description="Students group name")
 
 
 class UserResponseModel(BaseModel):
